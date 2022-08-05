@@ -1,5 +1,6 @@
 import { Knex } from "knex";
-import { IAccount } from "../types";
+import { tableNames } from "../../infra/database/types";
+import { IAccount, IBalanceUpdate } from "../types";
 import { CurrencyRepo } from "./CurrencyRepo";
 
 type AccountCreate = {
@@ -42,6 +43,38 @@ export class AccountRepo {
       .select('*')
       .where('account_id', id)
       .first();
+  }
+
+  public async listBalanceUpdates(account_id: number): Promise<IBalanceUpdate[]> {
+    return await this.db.table(tableNames.balanceUpdates)
+      .select('*')
+      .where('account_id', account_id)
+      .orderBy('updated_at', 'desc');
+  }
+
+  public async getLastBalanceUpdate(account_id: number): Promise<IBalanceUpdate> {
+    return await this.db.table(tableNames.balanceUpdates)
+      .select('*')
+      .where('account_id', account_id)
+      .orderBy('updated_at', 'desc')
+      .first();
+  }
+
+  public async createBalanceUpdate({
+    account_id,
+    new_balance,
+    description = null,
+    updated_at = new Date(),
+  }: {
+    account_id: number,
+    new_balance: number,
+    description?: string | null,
+    updated_at?: Date
+  }): Promise<IBalanceUpdate> {
+    const [created] = await this.db
+      .table('balance_updates')
+      .insert({ account_id, new_balance, description, updated_at }, "*");
+    return created;
   }
 
 }

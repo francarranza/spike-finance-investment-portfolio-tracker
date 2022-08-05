@@ -16,3 +16,11 @@ export interface ICurrency {
   name: string;
   symbol: string;
 }
+
+export interface IBalanceUpdate {
+  balance_update_id: number;
+  account_id: number;
+  new_balance: number;
+  description: string | null;
+  updated_at: Date;
+}

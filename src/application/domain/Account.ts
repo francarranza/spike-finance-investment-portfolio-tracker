@@ -47,11 +47,40 @@ export class Account {
   }
 
   public async list() {
+    // TODO: Should be static but I need those dependencies
     const accounts: IAccount[] = await this.deps.db.table('accounts').select('*');
     return accounts;
   }
 
-  public async updateBalance() { }
+  public async getBalance() {
+    if (!this.data.account_id) throw new Error('Account is not persisted');
+    const latest = await this.deps.repositories.account
+      .getLastBalanceUpdate(this.data.account_id);
+
+    if (latest) {
+      return latest.new_balance;
+    } else {
+      return this.data.starting_balance;
+    }
+  }
+
+  public async updateBalance({
+    new_balance,
+    description = null,
+    updated_at = new Date(),
+  }: {
+    new_balance: number,
+    description?: string | null,
+    updated_at?: Date
+  }) {
+    if (!this.data.account_id) throw new Error('Account is not persisted');
+    return await this.deps.repositories.account.createBalanceUpdate({
+      account_id: this.data.account_id,
+      new_balance,
+      description,
+      updated_at
+    });
+  }
 
 }
 

@@ -14,7 +14,7 @@ export async function up(knex: Knex): Promise<void> {
     table.string('name').notNullable();
     table.string('description');
     table.string('bank_name');
-    table.float('starting_balance').defaultTo(0).notNullable();
+    table.float('starting_balance').notNullable();
     table.string('currency_iso_code');
     table.foreign('currency_iso_code').references('currencies.currency_iso_code');
   });

@@ -1,12 +1,14 @@
 import { Account } from "./application/domain/Account";
 import { Currency } from "./application/domain/Currency";
 import { db } from "./infra/database";
+import { tableNames } from "./infra/database/types";
 import deps, { IDependencies } from "./infra/dependencies";
 
 
 async function main(deps: IDependencies) {
 
-  await db.table('accounts').truncate();
+  await db.table(tableNames.balanceUpdates).truncate()
+  await db.table('accounts').truncate()
   await db.table('currencies').truncate();
 
   await Promise.all([
@@ -23,8 +25,13 @@ async function main(deps: IDependencies) {
   ]);
 
   const binance = new Account({ name: 'Binance', description: '', currency_iso_code: 'USD', }, deps)
-  console.log(binance.info);
-  console.log(await binance.list())
+  await binance.persist();
+  await binance.updateBalance({ new_balance: 1200, description: 'monthly transfer' })
+  await binance.updateBalance({ new_balance: -100, description: 'monthly transfer' })
+  await binance.updateBalance({ new_balance: 800 })
+
+  console.log(await binance.getBalance())
+  process.exit(0)
 
 }
 
