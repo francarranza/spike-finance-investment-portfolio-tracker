@@ -153,5 +153,5 @@ test/fixtures/ts/*js
 !test/fixtures/eval/node_modules
 !test/fixtures/ts/transpile.cjs
 
-data/db.sqlite
+data/*.sqlite
 

@@ -1,4 +1,4 @@
-import { IDependencies } from '../../infra/dependencies'
+import deps, { IDependencies } from '../../infra/dependencies'
 import { IAccount, ICurrency } from '../types';
 
 type inAccount = {
@@ -17,7 +17,6 @@ export class Account {
 
   constructor(
     data: inAccount,
-    deps: IDependencies
   ) {
     this.data = {
       ...data,

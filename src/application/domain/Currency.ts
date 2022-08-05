@@ -1,12 +1,12 @@
-import { IDependencies } from "../../infra/dependencies";
 import { ICurrency } from "../types";
+import deps, { IDependencies } from "../../infra/dependencies";
 
 export class Currency {
 
   private deps: IDependencies;
   protected data: ICurrency | null = null;
 
-  constructor(data: ICurrency, deps: IDependencies) {
+  constructor(data: ICurrency) {
     this.deps = deps;
     this.data = data;
   }
