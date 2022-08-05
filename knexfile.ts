@@ -2,21 +2,30 @@ import type { Knex } from "knex";
 import { appConfig } from "./src/infra/config";
 
 // Update with your config settings.
+const migrations = {
+  tableName: 'migrations',
+  extension: 'ts',
+  directory: 'src/infra/database/migrations'
+}
 
-const config: { [key: string]: Knex.Config } = {
+const dbConfig: { [key: string]: Knex.Config } = {
   development: {
     client: "better-sqlite3",
     connection: {
       filename: appConfig.db.filepath
     },
-    migrations: {
-      tableName: 'migrations',
-      extension: 'ts',
-      directory: 'src/infra/database/migrations'
-    }
-
+    migrations
   },
+  test: {
+    client: "better-sqlite3",
+    connection: {
+      filename: 'data/test.sqlite'
+    },
+    migrations,
+  },
+
+
 
 };
 
-module.exports = config;
+export default dbConfig;

@@ -1,14 +1,5 @@
 import { Knex } from "knex";
+import dbConfig from '../../../knexfile'
 import { appConfig } from "../config";
 
-export const db: Knex = require("knex")({
-  client: 'better-sqlite3',
-  connection: {
-    filename: appConfig.db.filepath
-  },
-  migrations: {
-    tableName: 'migrations',
-    extension: 'ts',
-    directory: 'src/infra/database/migrations'
-  }
-});
+export const db: Knex = require("knex")(dbConfig[appConfig.node_env]);
