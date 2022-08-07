@@ -16,7 +16,7 @@ program
   .argument('<name>', 'Eg: Euro, Dollar, Pound')
   .argument('<symbol>', 'Eg: €, $')
   .action(async (iso_code, name, symbol) => {
-    const currency = new Currency({ currency_iso_code: iso_code, name, symbol }, deps)
+    const currency = new Currency({ currency_iso_code: iso_code, name, symbol })
     await currency.persist()
     console.info(currency.info);
     process.exit(0);
@@ -42,7 +42,7 @@ program.command('accounts-add')
       currency_iso_code: currency,
       bank_name: bank,
       starting_balance: startingBalance
-    }, deps);
+    });
     await account.persist();
     console.info(account.info)
   });
@@ -56,5 +56,21 @@ program
     process.exit(0);
   });
 
+program
+  .command('accounts-update-balance')
+  .description('Update account balance')
+  .option('--name <string>', 'Account\'s name')
+  .option('--new-balance <number>', 'New balance amount')
+  .action(async ({ name, newBalance }) => {
+    const accountDb = await deps.repositories.account.getByName(name)
+    const account = new Account(accountDb);
+    const beforeBalance = await account.getBalance();
+    console.info(`${beforeBalance} ${account.info.currency_iso_code} is the account ${account.info.name} balance before update`)
+
+    await account.updateBalance({ new_balance: newBalance });
+    const afterBalance = await account.getBalance()
+    console.info(`${afterBalance} ${account.info.currency_iso_code} is the account ${account.info.name} balance before update`)
+    process.exit(0);
+  });
 
 program.parse();

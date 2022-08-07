@@ -45,6 +45,13 @@ export class AccountRepo {
       .first();
   }
 
+  public async getByName(name: string): Promise<IAccount> {
+    return await this.db.table('accounts')
+      .select('*')
+      .where('name', name)
+      .first();
+  }
+
   public async listBalanceUpdates(account_id: number): Promise<IBalanceUpdate[]> {
     return await this.db.table(tableNames.balanceUpdates)
       .select('*')
