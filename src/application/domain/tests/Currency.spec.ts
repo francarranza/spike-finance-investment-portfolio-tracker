@@ -1,16 +1,18 @@
 import { assert, expect } from "chai";
-import { before, describe, it } from "mocha";
-import { truncateDb } from "../../../infra/database";
+import { before, beforeEach, describe, it } from "mocha";
+import { db, truncateDb } from "../../../infra/database";
+import { tableNames } from "../../../infra/database/types";
 import deps from "../../../infra/dependencies";
+import { ICurrencyRate } from "../../types";
 import { Currency } from "../Currency";
 
 describe('Currency Domain', () => {
 
-  before(async () => {
-    await truncateDb();
-  });
-
   describe('Currency.create()', () => {
+
+    beforeEach(async () => {
+      await truncateDb();
+    })
 
     it('Create new currency', async () => {
       const dollar = new Currency({ currency_iso_code: 'USD', name: 'Dollar', symbol: '$' });
@@ -23,7 +25,6 @@ describe('Currency Domain', () => {
     });
 
     it('Attempt to create existing currency', async () => {
-      await truncateDb();
       const dollar = new Currency({ currency_iso_code: 'USD', name: 'Dollar', symbol: '$' });
       await dollar.persist();
 
@@ -40,13 +41,23 @@ describe('Currency Domain', () => {
 
   describe('Currency.addRate()', () => {
 
+    beforeEach(async () => {
+      await truncateDb();
+    })
+
     it('Should add new rate', async () => {
 
       const dollar = new Currency({ currency_iso_code: 'USD', name: 'Dollar', symbol: '$' });
       await dollar.persist();
 
-      const peso = new Currency({ currency_iso_code: 'ARS', name: 'Dollar', symbol: '$' });
+      const peso = new Currency({ currency_iso_code: 'ARS', name: 'Peso', symbol: '$' });
       await peso.persist();
+
+      await peso.addRate({ quote_currency: dollar, value: 293 });
+      const rate: ICurrencyRate = await db.table(tableNames.currencyRates).select('*').first();
+      expect(rate.base).eq(peso.info.currency_iso_code)
+      expect(rate.quote).eq(dollar.info.currency_iso_code)
+      expect(rate.value).eq(293);
     });
 
   })

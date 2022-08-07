@@ -10,9 +10,8 @@ export async function up(knex: Knex): Promise<void> {
     table.string('type');
     table.float('value');
     table.date('close_at').notNullable();
-    table.date('created_at').notNullable();
-    table.foreign('base').references('currencies.iso_code');
-    table.foreign('quote').references('currencies.iso_code');
+    table.foreign('base').references('currencies.currency_iso_code');
+    table.foreign('quote').references('currencies.currency_iso_code');
   });
 }
 
