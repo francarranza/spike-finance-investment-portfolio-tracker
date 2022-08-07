@@ -9,30 +9,31 @@ const levels = {
 class Logger {
 
   private client;
-  public level;
+  public level: number;
 
   constructor() {
     this.client = console;
-    this.level = levels[logLevel] || levels.info;
+    // this.level = levels[logLevel] || levels.info;
+    this.level = levels.info;
   }
 
-  error(errorObj, message = '') {
+  error(errorObj: Error, message = '') {
     this.client.error(errorObj, message);
   }
 
-  debug(message) {
+  debug(message: string) {
     if (this.level <= 1) this.client.debug(message);
   }
 
-  info(message) {
+  info(message: string) {
     if (this.level <= 2) this.client.info(message);
   }
 
-  log(message) {
+  log(message: string) {
     this.info(message);
   }
 
-  warn(message, err) {
+  warn(message: string, err: Error) {
     if (this.level <= 3) {
       this.client.warn(message);
       this.client.warn(err);

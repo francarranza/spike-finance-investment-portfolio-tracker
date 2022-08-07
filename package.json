@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "tsc": "tsc",
-    "test:integration": "NODE_ENV=test node_modules/.bin/mocha --exit -r node_modules/ts-node/register src/**/*.spec.ts",
+    "test": "NODE_ENV=test node_modules/.bin/mocha --exit -r node_modules/ts-node/register src/**/*.spec.ts",
     "build": "rimraf ./dist && tsc"
   },
   "dependencies": {
