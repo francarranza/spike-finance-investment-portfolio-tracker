@@ -21,18 +21,4 @@ describe('Account Domain', () => {
     expect(balance).eq(900);
   });
 
-  it('Account.getBalance(): Should return latest balance = -50 USD', async () => {
-    await truncateDb();
-    const binance = new Account({ 
-      name: 'Binance2', description: '', currency_iso_code: 'USD', starting_balance: 900,
-    })
-    await binance.persist();
-    await binance.updateBalance({ new_balance: 100, });
-    await binance.updateBalance({ new_balance: 100, });
-    await binance.updateBalance({ new_balance: 100, });
-    await binance.updateBalance({ new_balance: -50, });
-    const balance = await binance.getBalance();
-    expect(balance).eq(-50);
-  });
-
 })
