@@ -1,15 +1,13 @@
 import { Account } from "./application/domain/Account";
 import { Currency } from "./application/domain/Currency";
-import { db } from "./infra/database";
+import { db, truncateDb } from "./infra/database";
 import { tableNames } from "./infra/database/types";
 import deps, { IDependencies } from "./infra/dependencies";
 
 
 async function main(deps: IDependencies) {
 
-  await db.table(tableNames.balanceUpdates).truncate()
-  await db.table('accounts').truncate()
-  await db.table('currencies').truncate();
+  await truncateDb()
 
   await Promise.all([
     (new Currency({ currency_iso_code: 'EUR', name: 'Euro', symbol: '€'})).persist(),
@@ -20,7 +18,6 @@ async function main(deps: IDependencies) {
 
   await Promise.all([
     (new Account({ name: 'Cash', description: 'Dinero que tengo en la mano', starting_balance: 50, currency_iso_code: 'ARS' })).persist(),
-    (new Account({ name: 'Cuenta N26', description: 'Cuenta que uso para gastar en el dia a dia', starting_balance: 3500, currency_iso_code: 'EUR' })).persist(),
     (new Account({ name: 'Cuenta Sabadell', description: 'Solo para pagar el alquiler', starting_balance: 350, currency_iso_code: 'EUR' })).persist(),
   ]);
 
@@ -30,6 +27,22 @@ async function main(deps: IDependencies) {
   await binance.updateBalance({ new_balance: -100, description: 'monthly transfer' })
   await binance.updateBalance({ new_balance: 800 })
 
+  // Transfer money
+  const n26 = new Account({ name: 'N26 Account', description: 'Day to day use', starting_balance: 3500, currency_iso_code: 'EUR' });
+  await n26.persist();
+  await n26.transferMoney({
+    to_account: binance,
+    amount: 500,
+    open_at: new Date('2021-01-01')
+  });
+  
+  await binance.transferMoney({
+    to_account: n26,
+    amount: 200,
+    open_at: new Date('2021-02-01')
+  })
+
+  await binance.getStats();
   console.log(await binance.getBalance())
   process.exit(0)
 

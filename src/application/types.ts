@@ -24,3 +24,15 @@ export interface IBalanceUpdate {
   description: string | null;
   updated_at: Date;
 }
+
+export interface IAccountActivity {
+  activity_id: number | null | undefined;
+  account_withdrawal_id: number;
+  account_deposit_id: number;
+  amount_withdrawal: number;
+  amount_deposit: number;
+  description: string | null;
+  fees: number | null;
+  open_at: Date;
+  created_at: Date;
+}

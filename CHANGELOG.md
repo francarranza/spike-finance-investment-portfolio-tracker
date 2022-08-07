@@ -8,6 +8,8 @@ TODO
   - Get whole balance in selecting any currency
 
 0.1
+  - Feature: `Account`: Transfer money from account A to account B
   - Feature: `Account`: Update account balance
+    - Add CLI support
   - Feature: `Account`: Create account with currency
   - Feature: `Currency`: Create
