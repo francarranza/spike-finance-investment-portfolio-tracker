@@ -2,10 +2,9 @@ import { assert, expect } from "chai";
 import { before, describe, it } from "mocha";
 import { truncateDb } from "../../../infra/database";
 import deps from "../../../infra/dependencies";
-import { Account } from "../Account";
 import { Currency } from "../Currency";
 
-describe('Account Domain', () => {
+describe('Currency Domain', () => {
 
   before(async () => {
     await truncateDb();
@@ -24,6 +23,7 @@ describe('Account Domain', () => {
     });
 
     it('Attempt to create existing currency', async () => {
+      await truncateDb();
       const dollar = new Currency({ currency_iso_code: 'USD', name: 'Dollar', symbol: '$' });
       await dollar.persist();
 

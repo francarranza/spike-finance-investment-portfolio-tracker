@@ -17,4 +17,7 @@ jobs:
           cmd: build # will run `yarn build` command
       - uses: borales/actions-yarn@v3.0.0
         with:
+          cmd: NODE_ENV=test ./node_modules/.bin/knex migrate:up
+      - uses: borales/actions-yarn@v3.0.0
+        with:
           cmd: test # will run `yarn test` command

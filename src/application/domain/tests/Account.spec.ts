@@ -22,6 +22,7 @@ describe('Account Domain', () => {
   });
 
   it('Account.getBalance(): Should return latest balance = -50 USD', async () => {
+    await truncateDb();
     const binance = new Account({ 
       name: 'Binance2', description: '', currency_iso_code: 'USD', starting_balance: 900,
     })
