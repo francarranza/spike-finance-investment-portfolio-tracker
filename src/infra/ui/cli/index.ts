@@ -3,6 +3,8 @@ import process from "process";
 import { Currency } from "../../../application/domain/Currency";
 import { Account } from "../../../application/domain/Account";
 import deps from "../../dependencies";
+import addCurrency from "../../../application/use-cases/addCurrency";
+import addCurrencyRatePair from "../../../application/use-cases/addCurrencyRatePair";
 
 program
   .name('Personal Finance Tracker')
@@ -16,9 +18,26 @@ program
   .argument('<name>', 'Eg: Euro, Dollar, Pound')
   .argument('<symbol>', 'Eg: €, $')
   .action(async (iso_code, name, symbol) => {
-    const currency = new Currency({ currency_iso_code: iso_code, name, symbol })
-    await currency.persist()
+    const currency = await addCurrency({ currency_iso_code: iso_code, name, symbol }, deps);
     console.info(currency.info);
+    process.exit(0);
+  });
+
+program
+  .command('currencies-add-rate')
+  .description('Add new currency rate pair')
+  .option('--base <string>', 'Currency ISO code. Eg: EUR, USD')
+  .option('--quote <string>', 'Currency ISO code. Eg: EUR, USD')
+  .option('--value <number>', 'Value of pair')
+  .action(async ({ base, quote, value }) => {
+    const close_at = new Date();
+    const pair = await addCurrencyRatePair({ 
+      base_iso_currency: base, 
+      quote_iso_currency: quote,
+      value,
+      close_at,
+    }, deps);
+    console.info(pair);
     process.exit(0);
   });
 

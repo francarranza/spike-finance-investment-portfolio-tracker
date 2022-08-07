@@ -1,5 +1,6 @@
 import { Knex } from "knex";
 import { tableNames } from "../../infra/database/types";
+import { Currency } from "../domain/Currency";
 import { ICurrency, ICurrencyRate } from "../types";
 
 export class CurrencyRepo {
@@ -18,10 +19,10 @@ export class CurrencyRepo {
     return await this.db.table('currencies').select('*');
   }
 
-  public async getByIsoCode(iso_code: string) {
+  public async getByIsoCode(iso_code: string): Promise<Currency> {
     const found = await this.db.table('currencies')
       .select("*").where('currency_iso_code', iso_code).first();
-    return found;
+    return new Currency(found);
   }
 
   public async insertNewRate({
