@@ -8,43 +8,44 @@ async function main(deps: IDependencies) {
 
   await truncateDb()
 
-  await Promise.all([
-    (new Currency({ currency_iso_code: 'EUR', name: 'Euro', symbol: '€'})).persist(),
-    (new Currency({ currency_iso_code: 'ARS', name: 'Peso', symbol: '$'})).persist(),
-    (new Currency({ currency_iso_code: 'USD', name: 'Dollar', symbol: '$'})).persist(),
-    (new Currency({ currency_iso_code: 'GBP', name: 'Pound', symbol: '£'})).persist(),
-  ])
+  const dollar = new Currency({ currency_iso_code: 'USD', name: 'Dollar', symbol: '$' });
+  await dollar.persist();
 
-  await Promise.all([
-    (new Account({ name: 'Cash', description: 'Dinero que tengo en la mano', starting_balance: 50, currency_iso_code: 'ARS' })).persist(),
-    (new Account({ name: 'Cuenta Sabadell', description: 'Solo para pagar el alquiler', starting_balance: 350, currency_iso_code: 'EUR' })).persist(),
-  ]);
+  const peso = new Currency({ currency_iso_code: 'ARS', name: 'Peso', symbol: '$' });
+  await peso.persist();
 
-  const binance = new Account({ name: 'Binance', description: '', currency_iso_code: 'USD', })
+  const binance = new Account({ name: 'Binance', description: '' }, dollar)
   await binance.persist();
   await binance.updateBalance({ new_balance: 1200, description: 'monthly transfer' })
   await binance.updateBalance({ new_balance: -100, description: 'monthly transfer' })
   await binance.updateBalance({ new_balance: 800 })
 
   // Transfer money
-  const n26 = new Account({ name: 'N26 Account', description: 'Day to day use', starting_balance: 3500, currency_iso_code: 'EUR' });
-  await n26.persist();
-  await n26.transferMoney({
+  const brubank = new Account({ name: 'Brubank Ahorro', description: 'Day to day use', starting_balance: 3500 }, peso);
+  await brubank.persist();
+  await brubank.transferMoney({
     to_account: binance,
     amount: 500,
     open_at: new Date('2021-01-01')
   });
-  
+
   await binance.transferMoney({
-    to_account: n26,
+    to_account: brubank,
     amount: 200,
     open_at: new Date('2021-02-01')
   })
 
   await binance.getStats();
-  console.log(await binance.getBalance())
-  process.exit(0)
 
+  // Currency rates
+  await dollar.addRate({ quote_currency: peso, value: 290 })
+  await dollar.addRate({ quote_currency: peso, value: 300 })
+
+
+  // Balance in other currency
+  await binance.getStats(peso);
+
+  process.exit(0)
 }
 
 main(deps)

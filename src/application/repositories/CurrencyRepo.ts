@@ -42,4 +42,15 @@ export class CurrencyRepo {
       .insert({ base, quote, type, value, close_at }, "*");
     return rate;
   }
+
+  public async getLatestRate({ base, quote }: { base: string, quote: string }) {
+    const rate: ICurrencyRate = await this.db.table(tableNames.currencyRates)
+      .select('*')
+      .where('base', base)
+      .where('quote', quote)
+      .orderBy('close_at', 'desc')
+      .first();
+
+    return rate;
+  }
 }

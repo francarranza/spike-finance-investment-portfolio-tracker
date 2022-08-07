@@ -20,8 +20,8 @@ describe('Currency Domain', () => {
 
       const retrieve = await deps.repositories.currency.getByIsoCode('USD');
       expect(retrieve).is.not.null;
-      expect(retrieve.name).eq('Dollar');
-      expect(retrieve.symbol).eq('$');
+      expect(retrieve.data.name).eq('Dollar');
+      expect(retrieve.data.symbol).eq('$');
     });
 
     it('Attempt to create existing currency', async () => {
@@ -55,8 +55,8 @@ describe('Currency Domain', () => {
 
       await peso.addRate({ quote_currency: dollar, value: 293 });
       const rate: ICurrencyRate = await db.table(tableNames.currencyRates).select('*').first();
-      expect(rate.base).eq(peso.info.currency_iso_code)
-      expect(rate.quote).eq(dollar.info.currency_iso_code)
+      expect(rate.base).eq(peso.data.currency_iso_code)
+      expect(rate.quote).eq(dollar.data.currency_iso_code)
       expect(rate.value).eq(293);
     });
 

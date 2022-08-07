@@ -4,16 +4,12 @@ import deps, { IDependencies } from "../../infra/dependencies";
 export class Currency {
 
   private deps: IDependencies;
-  protected data: ICurrency;
+  readonly data: ICurrency;
   protected isPersisted: boolean = false;
 
   constructor(data: ICurrency) {
     this.deps = deps;
     this.data = data;
-  }
-
-  get info() {
-    return this.data;
   }
 
   public async persist() {

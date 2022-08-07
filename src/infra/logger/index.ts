@@ -13,8 +13,8 @@ class Logger {
 
   constructor() {
     this.client = console;
-    // this.level = levels[logLevel] || levels.info;
-    this.level = levels.info;
+    // this.level = levels[logLevel] || levels.data;
+    this.level = levels.data;
   }
 
   error(errorObj: Error, message = '') {
@@ -26,11 +26,11 @@ class Logger {
   }
 
   info(message: string) {
-    if (this.level <= 2) this.client.info(message);
+    if (this.level <= 2) this.client.data(message);
   }
 
   log(message: string) {
-    this.info(message);
+    this.data(message);
   }
 
   warn(message: string, err: Error) {

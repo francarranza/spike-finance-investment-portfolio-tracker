@@ -19,7 +19,7 @@ program
   .argument('<symbol>', 'Eg: €, $')
   .action(async (iso_code, name, symbol) => {
     const currency = await addCurrency({ currency_iso_code: iso_code, name, symbol }, deps);
-    console.info(currency.info);
+    console.info(currency.data);
     process.exit(0);
   });
 
@@ -56,14 +56,15 @@ program.command('accounts-add')
   .option('--bank <string>', 'Bank name')
   .option('--starting-balance <number>', 'Starting balance in selected currency')
   .action(async ({ name, currency, bank, startingBalance }) => {
+    const curr = new Currency({ currency_iso_code: currency, name: '', symbol: ''})
     const account = new Account({
       name,
-      currency_iso_code: currency,
       bank_name: bank,
       starting_balance: startingBalance
-    });
+    }, curr);
     await account.persist();
-    console.info(account.info)
+    console.info(account)
+    process.exit(0);
   });
 
 program
@@ -82,13 +83,14 @@ program
   .option('--new-balance <number>', 'New balance amount')
   .action(async ({ name, newBalance }) => {
     const accountDb = await deps.repositories.account.getByName(name)
-    const account = new Account(accountDb);
+    const currency = await deps.repositories.currency.getByIsoCode(accountDb.currency_iso_code);
+    const account = new Account(accountDb, currency);
     const beforeBalance = await account.getBalance();
-    console.info(`${beforeBalance} ${account.info.currency_iso_code} is the account ${account.info.name} balance before update`)
+    console.info(`${beforeBalance} ${account.data.currency_iso_code} is the account ${account.data.name} balance before update`)
 
     await account.updateBalance({ new_balance: newBalance });
     const afterBalance = await account.getBalance()
-    console.info(`${afterBalance} ${account.info.currency_iso_code} is the account ${account.info.name} balance before update`)
+    console.info(`${afterBalance} ${account.data.currency_iso_code} is the account ${account.data.name} balance before update`)
     process.exit(0);
   });
 

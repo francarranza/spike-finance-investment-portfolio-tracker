@@ -8,14 +8,17 @@ describe('Account Domain', () => {
 
   before(async () => {
     await truncateDb();
-    const dollar = new Currency({ currency_iso_code: 'USD', name: 'Dollar', symbol: '$'});
+    const dollar = new Currency({ currency_iso_code: 'USD', name: 'Dollar', symbol: '$' });
     await dollar.persist();
   });
 
   it('Account.getBalance(): Should return starting balance', async () => {
-    const binance = new Account({ 
-      name: 'Binance', description: '', currency_iso_code: 'USD', starting_balance: 900,
-    })
+    const dollar = new Currency({ currency_iso_code: 'USD', name: 'Dollar', symbol: '$' });
+    await dollar.persist();
+
+    const binance = new Account({
+      name: 'Binance', description: '', starting_balance: 900,
+    }, dollar)
     await binance.persist();
     const balance = await binance.getBalance();
     expect(balance).eq(900);

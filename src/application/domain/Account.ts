@@ -5,7 +5,6 @@ import { Currency } from './Currency';
 type inAccount = {
   account_id?: number | null,
   name: string,
-  currency_iso_code: string,
   description?: string | null,
   bank_name?: string | null,
   starting_balance?: number,
@@ -14,31 +13,30 @@ type inAccount = {
 export class Account {
 
   private deps: IDependencies;
-  protected data: IAccount;
-  protected currency: ICurrency | null = null;
+  public data: IAccount;
+  protected currency: Currency;
 
   constructor(
     data: inAccount,
+    currency: Currency
   ) {
     this.data = {
       ...data,
       account_id: data.account_id || null,
       description: data.description || null,
       bank_name: data.bank_name || null,
+      currency_iso_code: currency.data.currency_iso_code,
       starting_balance: data.starting_balance || 0,
       created_at: new Date(),
       updated_at: new Date(),
     };
+    this.currency = currency;
     this.deps = deps;
 
-    if (!data.currency_iso_code || !data.name) {
+    if (!currency.data.currency_iso_code || !data.name) {
       throw new Error('Please check required values')
     }
 
-  }
-
-  public get info() {
-    return this.data;
   }
 
   public checkIsPersisted() {
@@ -105,7 +103,7 @@ export class Account {
     return transfer;
   }
 
-  public async getBalance(currenct?: Currency) {
+  public async getBalance(currency?: Currency) {
     if (!this.data.account_id) throw new Error('Account is not persisted');
 
     const [
@@ -124,13 +122,26 @@ export class Account {
       return prev + curr.amount_deposit;
     }, 0);
 
-    const balance = this.data.starting_balance + totalDeposits - totalWithdrawal;
-    return balance;
+    const balanceOurCurrency = this.data.starting_balance + totalDeposits - totalWithdrawal;
+
+    if (!currency || currency.data.currency_iso_code === this.data.currency_iso_code) {
+      return balanceOurCurrency;
+    } else {
+      const latestRate = await this.deps.repositories.currency.getLatestRate({
+        base: this.data.currency_iso_code,
+        quote: currency.data.currency_iso_code
+      });
+      if (!latestRate) throw new Error('No rate was found');
+      return balanceOurCurrency * latestRate.value;
+
+    }
+
   }
 
-  public async getStats() {
+  public async getStats(currency?: Currency) {
 
     if (!this.data.account_id) throw new Error('Account is not persisted');
+    const selectedCurrency = currency || this.currency;
 
     const [
       deposits,
@@ -140,15 +151,7 @@ export class Account {
       this.deps.repositories.accountActivity.listWithdrawals(this.data.account_id),
     ]);
 
-    const totalDeposits = deposits.reduce((prev, curr) => {
-      return prev + curr.amount_deposit;
-    }, 0);
-
-    const totalWithdrawal = withdrawals.reduce((prev, curr) => {
-      return prev + curr.amount_deposit;
-    }, 0);
-
-    console.info('Account All Information')
+    console.info(`--- ${this.data.name} Account Stats ---`)
     console.info(this.data);
 
     console.info('List deposits');
@@ -157,8 +160,8 @@ export class Account {
     console.info('List withdrawals');
     console.table(withdrawals);
 
-    const balance = this.data.starting_balance + totalDeposits - totalWithdrawal;
-    console.info(`Current balance is ${balance} ${this.data.currency_iso_code}`)
+    const balance = await this.getBalance(currency)
+    console.info(`Current balance is ${balance} ${selectedCurrency.data.currency_iso_code}`)
   }
 
 }

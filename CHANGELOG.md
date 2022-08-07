@@ -1,10 +1,10 @@
 
 TODO
-  - Get account balance selecting currency
   - Get whole balance in selecting any currency
 
 0.2
-  - Feature `Accounts`: Get balance now supporting transfers between accounts
+  - Feature `Account`: Get account balance selecting currency
+  - Feature `Account`: Get balance now supporting transfers between accounts
   - Feature `Currency`: Add currency rates (ingest manually via CLI)
 
 0.1
