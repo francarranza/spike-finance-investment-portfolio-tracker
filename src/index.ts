@@ -1,7 +1,6 @@
 import { Account } from "./application/domain/Account";
 import { Currency } from "./application/domain/Currency";
-import { db, truncateDb } from "./infra/database";
-import { tableNames } from "./infra/database/types";
+import { truncateDb } from "./infra/database";
 import deps, { IDependencies } from "./infra/dependencies";
 
 
