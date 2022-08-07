@@ -18,6 +18,9 @@ jobs:
         with:
           cmd: build # will run `yarn build` command
 
+      - name: Create data directory
+        run: mkdir ./data
+
       - name: Run migrations
         run: NODE_ENV=test ./node_modules/.bin/knex migrate:up
 
