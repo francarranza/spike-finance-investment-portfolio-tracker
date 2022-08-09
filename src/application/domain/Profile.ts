@@ -13,6 +13,7 @@ type ProfileCreate = {
 
 type AccountCreate = {
   name: string,
+  currency: Currency;
   description?: string | null,
   bank_name?: string | null,
   starting_balance?: number,
@@ -67,12 +68,41 @@ export class Profile {
     return accounts;
   }
 
-  public async createAccount(account: AccountCreate, currency: Currency) {
+  /**
+   * Creates account with selected currency
+   */
+  public async createAccount(input: AccountCreate) {
     if (!this._data?.profile_id) throw new Error('Profile is not initialized with data');
-    const created = new Account({ ...account, profile_id: this._data.profile_id }, currency);
+    const created = new Account({ ...input, profile_id: this._data.profile_id }, input.currency);
     await created.persist()
     this._accounts.push(created);
     return created;
+  }
+
+  /**
+   * Get balance from all accounts applying selected currency rates.
+   */
+  public async getWholeBalance(currency: Currency) {
+    if (!this._accounts.length) {
+      await this.getAccounts();
+    }
+
+    const accountBalancesProms = this._accounts.map(acc => {
+      return acc.getBalance(currency);
+    });
+
+    const accountBalances = await Promise.all(accountBalancesProms);
+    const total = accountBalances.reduce((prev, total) => prev + total, 0);
+
+    const print = this._accounts.map((acc, index) => {
+      const balanceKey = `Balance in ${currency.data.currency_iso_code}`
+      return { 'Account Name': acc.data.name, 'Currency': acc.data.currency_iso_code, [balanceKey]: accountBalances[index] }
+    })
+
+    print.push({ 'Account Name': 'Total', 'Currency': currency.data.currency_iso_code, balance: total });
+    console.table(print)
+
+    return total;
   }
 
 }

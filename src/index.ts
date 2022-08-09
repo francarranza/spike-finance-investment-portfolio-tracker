@@ -1,29 +1,34 @@
 import { Currency } from "./application/domain/Currency";
 import { Profile } from "./application/domain/Profile";
 import { truncateDb } from "./infra/database";
+import seedCurrencies from "./infra/database/seeds/currencies";
 import deps, { IDependencies } from "./infra/dependencies";
-
 
 async function main(deps: IDependencies) {
 
   await truncateDb()
-
-  const dollar = new Currency({ currency_iso_code: 'USD', name: 'Dollar', symbol: '$' });
-  await dollar.persist();
-
-  const peso = new Currency({ currency_iso_code: 'ARS', name: 'Peso', symbol: '$' });
-  await peso.persist();
+  const {
+    peso,
+    dollar,
+    euro
+  } = await seedCurrencies()
 
   const profile = new Profile({ firstname: 'Francisco', preferred_currency: 'USD' });
   await profile.persist();
 
-  const binance = await profile.createAccount({ name: 'Binance', description: '' }, dollar)
+  // Create accounts
+  const binance = await profile.createAccount({ name: 'Binance', description: '', currency: dollar })
+  const brubank = await profile.createAccount({ name: 'Brubank Ahorro', description: 'Day to day use', starting_balance: 3500, currency: peso });
+  const n26 = await profile.createAccount({ name: 'N26 Account', description: 'Pay rent', currency: euro });
+
+  // Update balances
   await binance.updateBalance({ new_balance: 1200, description: 'monthly transfer' })
   await binance.updateBalance({ new_balance: -100, description: 'monthly transfer' })
   await binance.updateBalance({ new_balance: 800 })
 
+  await n26.updateBalance({ new_balance: 2500 });
+
   // Transfer money
-  const brubank = await profile.createAccount({ name: 'Brubank Ahorro', description: 'Day to day use', starting_balance: 3500 }, peso);
   await brubank.persist();
   await brubank.transferMoney({
     to_account: binance,
@@ -37,20 +42,12 @@ async function main(deps: IDependencies) {
     open_at: new Date('2021-02-01')
   })
 
-  await binance.getStats();
+  console.log('binance', await binance.getBalance(), binance.data.currency_iso_code);
+  console.log('brubank', await brubank.getBalance(), brubank.data.currency_iso_code);
+  console.log('n26', await n26.getBalance(), n26.data.currency_iso_code);
 
-  // Currency rates
-  await dollar.addRate({ quote_currency: peso, value: 290 })
-  await dollar.addRate({ quote_currency: peso, value: 300 })
-
-
-  // Balance in other currency
-  await binance.getStats(peso);
-
-  // List accounts from profile
-  console.info('PROFILE GET ACCOUNTS')
-  await profile.getAccounts()
-  console.log(profile.accounts)
+  console.info('Profile Whole Balance');
+  console.info(await profile.getWholeBalance(peso), peso.data.name)
 
   process.exit(0)
 }
