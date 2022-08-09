@@ -47,6 +47,11 @@ async function main(deps: IDependencies) {
   // Balance in other currency
   await binance.getStats(peso);
 
+  // List accounts from profile
+  console.info('PROFILE GET ACCOUNTS')
+  await profile.getAccounts()
+  console.log(profile.accounts)
+
   process.exit(0)
 }
 

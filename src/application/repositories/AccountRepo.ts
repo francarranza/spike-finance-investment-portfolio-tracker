@@ -6,6 +6,7 @@ import { CurrencyRepo } from "./CurrencyRepo";
 
 type AccountCreate = {
   name: string,
+  profile_id: number,
   currency_iso_code: string,
   bank_name: string | null,
   starting_balance: number,
@@ -22,7 +23,7 @@ export class AccountRepo {
     this.currencyRepo = currencyRepo;
   }
 
-  public async create({ name, currency_iso_code, bank_name, starting_balance, description }: AccountCreate): Promise<IAccount> {
+  public async create({ profile_id, name, currency_iso_code, bank_name, starting_balance, description }: AccountCreate): Promise<IAccount> {
     if (currency_iso_code) {
       const found = this.currencyRepo.getByIsoCode(currency_iso_code);
       if (!found) throw new Error('[AccountRepo.create] iso_code not found');
@@ -30,7 +31,7 @@ export class AccountRepo {
 
     const [account] = await this.db
       .table(tableNames.accounts)
-      .insert({ name, bank_name, starting_balance, currency_iso_code, description }, "*");
+      .insert({ profile_id, name, bank_name, starting_balance, currency_iso_code, description }, "*");
 
     return account;
   }

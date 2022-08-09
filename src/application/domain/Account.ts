@@ -40,11 +40,6 @@ export class Account {
 
   }
 
-  public checkIsPersisted() {
-    if (!this.data.account_id) throw new Error(`Account ${this.data.name} is not persisted`);
-    return true;
-  }
-
   public async persist(): Promise<IAccount> {
     this.data = await this.deps.repositories.account.create(this.data);
     return this.data;;

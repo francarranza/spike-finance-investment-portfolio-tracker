@@ -23,6 +23,11 @@ TODO
       Eg: MELI I could have bought and selled many times, at different prices
     - Compare my performance with others such as SP500, Nasdaq100, an ETF, etc.
 
+0.3
+  - Feature `Profile`: 
+    - Create profile
+    - Create accounts from profile
+    - List accounts from profile
 
 0.2
   - Feature `Account`: Get account balance selecting currency

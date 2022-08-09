@@ -21,9 +21,8 @@ type AccountCreate = {
 export class Profile {
 
   private deps: IDependencies;
-  readonly data: IProfile;
-  protected isPersisted: boolean = false;
-  protected accounts: Account[] = [];
+  private _data: IProfile;
+  private _accounts: Account[] = [];
 
   constructor({
     firstname,
@@ -33,7 +32,7 @@ export class Profile {
     email = null,
   }: ProfileCreate) {
     this.deps = deps;
-    this.data = {
+    this._data = {
       profile_id,
       firstname,
       lastname,
@@ -47,24 +46,32 @@ export class Profile {
     if (!preferred_currency) throw new Error('Profile: Please provide a currency');
   }
 
+  public get data() {
+    return this._data;
+  }
+
+  public get accounts() {
+    return this._accounts;
+  }
+
   public async persist() {
-    if (!this.data) throw new Error('Profile is not initialized with data');
-    await this.deps.repositories.profile.create(this.data);
-    this.isPersisted = true;
+    if (!this._data) throw new Error('Profile is not initialized with data');
+    const created = await this.deps.repositories.profile.create(this._data);
+    this._data = created;
   }
 
   public async getAccounts() {
-    if (!this.data?.profile_id) throw new Error('Profile is not initialized with data');
-    const accounts = await this.deps.repositories.account.listByProfile(this.data.profile_id);
-    this.accounts = accounts;
+    if (!this._data?.profile_id) throw new Error('Profile is not initialized with data');
+    const accounts = await this.deps.repositories.account.listByProfile(this._data.profile_id);
+    this._accounts = accounts;
     return accounts;
   }
 
   public async createAccount(account: AccountCreate, currency: Currency) {
-    if (!this.data?.profile_id) throw new Error('Profile is not initialized with data');
-    const created = new Account({ ...account, profile_id: this.data.profile_id }, currency);
+    if (!this._data?.profile_id) throw new Error('Profile is not initialized with data');
+    const created = new Account({ ...account, profile_id: this._data.profile_id }, currency);
     await created.persist()
-    this.accounts.push(created);
+    this._accounts.push(created);
     return created;
   }
 

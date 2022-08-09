@@ -17,6 +17,8 @@ export async function up(knex: Knex): Promise<void> {
     table.string('bank_name');
     table.float('starting_balance').notNullable();
     table.string('currency_iso_code');
+    table.date('created_at');
+    table.date('updated_at');
     table.foreign('currency_iso_code').references('currencies.currency_iso_code');
     table.foreign('profile_id').references('profiles.profile_id');
   });

@@ -5,7 +5,6 @@ export class Currency {
 
   private deps: IDependencies;
   readonly data: ICurrency;
-  protected isPersisted: boolean = false;
 
   constructor(data: ICurrency) {
     this.deps = deps;
@@ -15,7 +14,6 @@ export class Currency {
   public async persist() {
     if (!this.data) throw new Error('Currency is not initialized with data');
     await this.deps.repositories.currency.create(this.data);
-    this.isPersisted = true;
   }
 
   public async listAll() {

@@ -12,9 +12,9 @@ export class ProfileRepo {
     this.table = this.db.table<IProfile>(tableNames.profiles)
   }
 
-  public async create(data: IProfile): Promise<Profile> {
+  public async create(data: IProfile): Promise<IProfile> {
     const [inserted] = await this.table.insert(data, "*");
-    return new Profile(inserted);
+    return inserted;
   }
 
   public async getById(profile_id: number): Promise<Profile | null> {
