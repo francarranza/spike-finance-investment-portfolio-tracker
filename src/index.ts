@@ -1,5 +1,5 @@
-import { Account } from "./application/domain/Account";
 import { Currency } from "./application/domain/Currency";
+import { Profile } from "./application/domain/Profile";
 import { truncateDb } from "./infra/database";
 import deps, { IDependencies } from "./infra/dependencies";
 
@@ -14,14 +14,16 @@ async function main(deps: IDependencies) {
   const peso = new Currency({ currency_iso_code: 'ARS', name: 'Peso', symbol: '$' });
   await peso.persist();
 
-  const binance = new Account({ name: 'Binance', description: '' }, dollar)
-  await binance.persist();
+  const profile = new Profile({ firstname: 'Francisco', preferred_currency: 'USD' });
+  await profile.persist();
+
+  const binance = await profile.createAccount({ name: 'Binance', description: '' }, dollar)
   await binance.updateBalance({ new_balance: 1200, description: 'monthly transfer' })
   await binance.updateBalance({ new_balance: -100, description: 'monthly transfer' })
   await binance.updateBalance({ new_balance: 800 })
 
   // Transfer money
-  const brubank = new Account({ name: 'Brubank Ahorro', description: 'Day to day use', starting_balance: 3500 }, peso);
+  const brubank = await profile.createAccount({ name: 'Brubank Ahorro', description: 'Day to day use', starting_balance: 3500 }, peso);
   await brubank.persist();
   await brubank.transferMoney({
     to_account: binance,

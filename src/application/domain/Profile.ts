@@ -1,5 +1,7 @@
-import { IProfile } from "../types";
+import { ICurrency, IProfile } from "../types";
 import deps, { IDependencies } from "../../infra/dependencies";
+import { Account, inAccount } from "./Account";
+import { Currency } from "./Currency";
 
 type ProfileCreate = {
   firstname: string;
@@ -9,11 +11,19 @@ type ProfileCreate = {
   email?: string | null;
 }
 
+type AccountCreate = {
+  name: string,
+  description?: string | null,
+  bank_name?: string | null,
+  starting_balance?: number,
+}
+
 export class Profile {
 
   private deps: IDependencies;
   readonly data: IProfile;
   protected isPersisted: boolean = false;
+  protected accounts: Account[] = [];
 
   constructor({
     firstname,
@@ -43,10 +53,19 @@ export class Profile {
     this.isPersisted = true;
   }
 
-  public async listAccounts() {
+  public async getAccounts() {
     if (!this.data?.profile_id) throw new Error('Profile is not initialized with data');
     const accounts = await this.deps.repositories.account.listByProfile(this.data.profile_id);
+    this.accounts = accounts;
     return accounts;
+  }
+
+  public async createAccount(account: AccountCreate, currency: Currency) {
+    if (!this.data?.profile_id) throw new Error('Profile is not initialized with data');
+    const created = new Account({ ...account, profile_id: this.data.profile_id }, currency);
+    await created.persist()
+    this.accounts.push(created);
+    return created;
   }
 
 }

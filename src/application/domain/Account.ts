@@ -2,8 +2,9 @@ import deps, { IDependencies } from '../../infra/dependencies'
 import { IAccount, ICurrency } from '../types';
 import { Currency } from './Currency';
 
-type inAccount = {
+export type inAccount = {
   account_id?: number | null,
+  profile_id: number,
   name: string,
   description?: string | null,
   bank_name?: string | null,
@@ -47,13 +48,6 @@ export class Account {
   public async persist(): Promise<IAccount> {
     this.data = await this.deps.repositories.account.create(this.data);
     return this.data;;
-
-  }
-
-  public async list() {
-    // TODO: Should be static but I need those dependencies
-    const accounts: IAccount[] = await this.deps.db.table('accounts').select('*');
-    return accounts;
   }
 
   public async updateBalance({

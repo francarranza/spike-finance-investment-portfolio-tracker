@@ -11,6 +11,7 @@ export interface IProfile {
 export interface IAccount {
   account_id: number | null | undefined;
   currency_iso_code: string;
+  profile_id: number;
   name: string;
   description: string | null;
   bank_name: string | null;
