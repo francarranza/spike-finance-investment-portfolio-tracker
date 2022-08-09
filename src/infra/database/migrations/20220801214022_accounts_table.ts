@@ -11,12 +11,14 @@ export async function up(knex: Knex): Promise<void> {
 
   await knex.schema.createTable('accounts', (table) => {
     table.increments('account_id');
+    table.integer('profile_id');
     table.string('name').notNullable();
     table.string('description');
     table.string('bank_name');
     table.float('starting_balance').notNullable();
     table.string('currency_iso_code');
     table.foreign('currency_iso_code').references('currencies.currency_iso_code');
+    table.foreign('profile_id').references('profiles.profile_id');
   });
 
 }

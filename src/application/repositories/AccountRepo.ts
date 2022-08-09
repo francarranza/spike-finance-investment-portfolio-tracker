@@ -1,5 +1,6 @@
 import { Knex } from "knex";
 import { tableNames } from "../../infra/database/types";
+import { Account } from "../domain/Account";
 import { IAccount, IBalanceUpdate } from "../types";
 import { CurrencyRepo } from "./CurrencyRepo";
 
@@ -28,25 +29,38 @@ export class AccountRepo {
     }
 
     const [account] = await this.db
-      .table('accounts')
+      .table(tableNames.accounts)
       .insert({ name, bank_name, starting_balance, currency_iso_code, description }, "*");
 
     return account;
   }
 
   public async list() {
-    return await this.db.table('accounts').select('*');
+    return await this.db.table(tableNames.accounts).select('*');
+  }
+
+  public async listByProfile(profile_id: number): Promise<Account[]> {
+    const accountsDb: IAccount[] = await this.db.table(tableNames.accounts)
+      .select('*')
+      .where('profile_id', profile_id)
+      .orderBy('bank_name', 'asc');
+
+    const proms = accountsDb.map(async (acc) => {
+      const currDb = await this.currencyRepo.getByIsoCode(acc.currency_iso_code)
+      return new Account(acc, currDb)
+    });
+    return await Promise.all(proms);
   }
 
   public async getById(id: number): Promise<IAccount> {
-    return await this.db.table('accounts')
+    return await this.db.table(tableNames.accounts)
       .select('*')
       .where('account_id', id)
       .first();
   }
 
   public async getByName(name: string): Promise<IAccount> {
-    return await this.db.table('accounts')
+    return await this.db.table(tableNames.accounts)
       .select('*')
       .where('name', name)
       .first();

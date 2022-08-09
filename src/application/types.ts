@@ -1,3 +1,13 @@
+export interface IProfile {
+  profile_id: number | null | undefined;
+  preferred_currency: string;
+  firstname: string;
+  lastname: string | null;
+  email: string | null;
+  created_at: Date;
+  updated_at: Date;
+}
+
 export interface IAccount {
   account_id: number | null | undefined;
   currency_iso_code: string;

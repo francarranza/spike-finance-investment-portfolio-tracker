@@ -12,6 +12,7 @@ export async function truncateDb() {
     tableNames.accountActivity,
     tableNames.balanceUpdates,
     tableNames.accounts,
+    tableNames.profiles,
     tableNames.currencies,
   ];
 

@@ -6,10 +6,8 @@ import { Currency } from "../Currency";
 
 describe('Account Domain', () => {
 
-  before(async () => {
+  beforeEach(async () => {
     await truncateDb();
-    const dollar = new Currency({ currency_iso_code: 'USD', name: 'Dollar', symbol: '$' });
-    await dollar.persist();
   });
 
   it('Account.getBalance(): Should return starting balance', async () => {
