@@ -1,7 +1,8 @@
 import { Knex } from "knex";
 import { tableNames } from "../../infra/database/types";
+import { Currency } from "../domain/Currency";
 import { Profile } from "../domain/Profile";
-import { IProfile } from "../types";
+import { ICurrency, IProfile } from "../types";
 
 export class ProfileRepo {
 
@@ -18,12 +19,21 @@ export class ProfileRepo {
   }
 
   public async getById(profile_id: number): Promise<Profile | null> {
-    const found = await this.db.table(tableNames.profiles)
+    const found = await this.db.table<IProfile>(tableNames.profiles)
       .select("*")
       .where('profile_id', profile_id)
       .first();
     if (!found) return null;
-    return new Profile(found);
+
+    const currency = await this.db.table<ICurrency>('currencies')
+      .select("*")
+      .where('currency_iso_code', found.preferred_currency)
+      .first();
+
+    if (!currency) return null;
+    const currInstance = new Currency(currency);
+
+    return new Profile({ ...found, preferred_currency: currInstance });
   }
 
 }

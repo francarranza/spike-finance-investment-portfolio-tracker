@@ -1,7 +1,6 @@
 
 TODO
   - Accounts
-    - Get whole balance in selecting any currency
     - Expenses features: Insert, getBalance()
     - Income features: Insert, getBalance()
 
@@ -24,6 +23,7 @@ TODO
     - Compare my performance with others such as SP500, Nasdaq100, an ETF, etc.
 
 0.3
+  - Feature: Get whole balance in selected currency
   - Feature `Profile`: 
     - Create profile
     - Create accounts from profile

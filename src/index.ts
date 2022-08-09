@@ -13,7 +13,7 @@ async function main(deps: IDependencies) {
     euro
   } = await seedCurrencies()
 
-  const profile = new Profile({ firstname: 'Francisco', preferred_currency: 'USD' });
+  const profile = new Profile({ firstname: 'Francisco', preferred_currency: dollar });
   await profile.persist();
 
   // Create accounts

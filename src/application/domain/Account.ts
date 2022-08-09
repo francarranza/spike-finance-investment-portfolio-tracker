@@ -92,7 +92,7 @@ export class Account {
     return transfer;
   }
 
-  public async getBalance(currency?: Currency) {
+  public async getBalance(currency: Currency = this.currency) {
     if (!this.data.account_id) throw new Error('Account is not persisted');
 
     const [
@@ -113,9 +113,10 @@ export class Account {
 
     const balanceOurCurrency = this.data.starting_balance + totalDeposits - totalWithdrawal;
 
-    if (!currency || currency.data.currency_iso_code === this.data.currency_iso_code) {
+    if (currency.data.currency_iso_code === this.currency.data.currency_iso_code) {
       return balanceOurCurrency;
-    } else {
+    } 
+    else {
       const latestRate = await this.deps.repositories.currency.getLatestRate({
         base: this.data.currency_iso_code,
         quote: currency.data.currency_iso_code

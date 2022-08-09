@@ -1,11 +1,11 @@
-import { ICurrency, IProfile } from "../types";
+import { IProfile } from "../types";
 import deps, { IDependencies } from "../../infra/dependencies";
-import { Account, inAccount } from "./Account";
+import { Account } from "./Account";
 import { Currency } from "./Currency";
 
 type ProfileCreate = {
   firstname: string;
-  preferred_currency: string;
+  preferred_currency: Currency;
   profile_id?: number | null | undefined;
   lastname?: string | null;
   email?: string | null;
@@ -23,6 +23,7 @@ export class Profile {
 
   private deps: IDependencies;
   private _data: IProfile;
+  private _currency: Currency;
   private _accounts: Account[] = [];
 
   constructor({
@@ -33,12 +34,13 @@ export class Profile {
     email = null,
   }: ProfileCreate) {
     this.deps = deps;
+    this._currency = preferred_currency;
     this._data = {
       profile_id,
       firstname,
       lastname,
       email,
-      preferred_currency,
+      preferred_currency: preferred_currency.data.currency_iso_code,
       created_at: new Date(),
       updated_at: new Date(),
     };
@@ -82,7 +84,7 @@ export class Profile {
   /**
    * Get balance from all accounts applying selected currency rates.
    */
-  public async getWholeBalance(currency: Currency) {
+  public async getWholeBalance(currency: Currency = this._currency) {
     if (!this._accounts.length) {
       await this.getAccounts();
     }
