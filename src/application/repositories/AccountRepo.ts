@@ -48,6 +48,7 @@ export class AccountRepo {
 
     const proms = accountsDb.map(async (acc) => {
       const currDb = await this.currencyRepo.getByIsoCode(acc.currency_iso_code)
+      if(!currDb) throw new Error('Currency not found')
       return new Account(acc, currDb)
     });
     return await Promise.all(proms);

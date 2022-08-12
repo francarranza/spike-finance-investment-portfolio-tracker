@@ -19,9 +19,10 @@ export class CurrencyRepo {
     return await this.db.table('currencies').select('*');
   }
 
-  public async getByIsoCode(iso_code: string): Promise<Currency> {
+  public async getByIsoCode(iso_code: string): Promise<Currency | null> {
     const found = await this.db.table('currencies')
       .select("*").where('currency_iso_code', iso_code).first();
+    if (!found) return null;
     return new Currency(found);
   }
 

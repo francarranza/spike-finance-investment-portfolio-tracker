@@ -103,6 +103,7 @@ export class Account {
       this.deps.repositories.accountActivity.listWithdrawals(this.data.account_id),
     ]);
 
+
     const totalDeposits = deposits.reduce((prev, curr) => {
       return prev + curr.amount_deposit;
     }, 0);
@@ -113,17 +114,18 @@ export class Account {
 
     const balanceOurCurrency = this.data.starting_balance + totalDeposits - totalWithdrawal;
 
-    if (currency.data.currency_iso_code === this.currency.data.currency_iso_code) {
+    const base = this.currency.data.currency_iso_code;
+    const quote = currency.data.currency_iso_code;
+    if (base === quote) {
       return balanceOurCurrency;
-    } 
+    }
     else {
       const latestRate = await this.deps.repositories.currency.getLatestRate({
-        base: this.data.currency_iso_code,
-        quote: currency.data.currency_iso_code
+        base, quote,
       });
-      if (!latestRate) throw new Error('No rate was found');
-      return balanceOurCurrency * latestRate.value;
 
+      if (!latestRate) throw new Error(`No rate was found for pair ${base}:${quote}`);
+      return balanceOurCurrency * latestRate.value;
     }
 
   }

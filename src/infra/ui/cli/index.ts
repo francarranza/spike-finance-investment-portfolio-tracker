@@ -60,7 +60,8 @@ program.command('accounts-add')
     const account = new Account({
       name,
       bank_name: bank,
-      starting_balance: startingBalance
+      profile_id: 1,
+      starting_balance: startingBalance,
     }, curr);
     await account.persist();
     console.info(account)
@@ -84,6 +85,12 @@ program
   .action(async ({ name, newBalance }) => {
     const accountDb = await deps.repositories.account.getByName(name)
     const currency = await deps.repositories.currency.getByIsoCode(accountDb.currency_iso_code);
+
+    if (!currency) {
+      console.error('Currency not found')
+      process.exit(1)
+    }
+
     const account = new Account(accountDb, currency);
     const beforeBalance = await account.getBalance();
     console.info(`${beforeBalance} ${account.data.currency_iso_code} is the account ${account.data.name} balance before update`)
@@ -91,6 +98,27 @@ program
     await account.updateBalance({ new_balance: newBalance });
     const afterBalance = await account.getBalance()
     console.info(`${afterBalance} ${account.data.currency_iso_code} is the account ${account.data.name} balance before update`)
+    process.exit(0);
+  });
+
+program
+  .command('accounts-status')
+  .description('Balances summary in selected currency')
+  .option('--currency <string>', 'Currency ISO code. Eg: EUR')
+  .action(async ({ currency }) => {
+    if(!currency) {
+      console.error('Must provide a currency ISO code')
+      process.exit(1)
+    }
+
+    const currInstance = await deps.repositories.currency.getByIsoCode(currency)
+    if (!currInstance) {
+      console.error('Currency not found')
+      process.exit(1)
+    }
+
+    const profile = await deps.repositories.profile.getById(1);
+    await profile?.printAccountStatus(currInstance);
     process.exit(0);
   });
 

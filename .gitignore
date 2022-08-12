@@ -154,4 +154,4 @@ test/fixtures/ts/*js
 !test/fixtures/ts/transpile.cjs
 
 data/*.sqlite
-
+scripts/load-accounts.ts

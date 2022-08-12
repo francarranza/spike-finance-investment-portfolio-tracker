@@ -70,6 +70,41 @@ export class Profile {
     return accounts;
   }
 
+  public async printAccountStatus(currency: Currency = this._currency) {
+    type PrintRow = {
+      account_id: number | undefined | null,
+      name: string,
+      description: string | null,
+      bank_name: string | null,
+      balance: number,
+      currency: string,
+    };
+
+    if (!this._accounts.length) {
+      await this.getAccounts();
+    }
+
+    const accountBalances = await Promise.all(this._accounts.map(acc => acc.getBalance(currency)));
+    const toPrint = this._accounts.map(({ data }, index): PrintRow => {
+      return {
+        account_id: data.account_id,
+        name: data.name,
+        description: data.description,
+        bank_name: data.bank_name,
+        balance: accountBalances[index],
+        currency: currency.data.currency_iso_code || data.currency_iso_code
+      }
+    });
+
+    console.info('All account status')
+    console.table(toPrint)
+
+    const total = await this.getWholeBalance(currency);
+    console.info('Whole accounts balance')
+    console.info(`${total.toLocaleString()} ${currency.data.currency_iso_code}`)
+
+  }
+
   /**
    * Creates account with selected currency
    */
@@ -95,15 +130,6 @@ export class Profile {
 
     const accountBalances = await Promise.all(accountBalancesProms);
     const total = accountBalances.reduce((prev, total) => prev + total, 0);
-
-    const print = this._accounts.map((acc, index) => {
-      const balanceKey = `Balance in ${currency.data.currency_iso_code}`
-      return { 'Account Name': acc.data.name, 'Currency': acc.data.currency_iso_code, [balanceKey]: accountBalances[index] }
-    })
-
-    print.push({ 'Account Name': 'Total', 'Currency': currency.data.currency_iso_code, balance: total });
-    console.table(print)
-
     return total;
   }
 
