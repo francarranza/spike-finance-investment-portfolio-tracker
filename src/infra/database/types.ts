@@ -5,4 +5,6 @@ export const tableNames = {
   currencies: 'currencies',
   currencyRates: 'currency_rates',
   profiles: 'profiles',
+  transactions: 'transactions',
+  transactionCategories: 'transaction_categories',
 }

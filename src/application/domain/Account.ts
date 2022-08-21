@@ -1,9 +1,12 @@
 import deps, { IDependencies } from '../../infra/dependencies'
+import { BaseDomain } from '../common/BaseDomain';
+import { DomainError } from '../common/errors/DomainError';
 import { IAccount, ICurrency } from '../types';
 import { Currency } from './Currency';
+import { Transaction } from './Transaction';
 
 export type inAccount = {
-  account_id?: number | null,
+  account_id: number | null,
   profile_id: number,
   name: string,
   description?: string | null,
@@ -11,19 +14,24 @@ export type inAccount = {
   starting_balance?: number,
 }
 
-export class Account {
+export class AccountError extends DomainError {}
 
-  private deps: IDependencies;
-  public data: IAccount;
+export class Account extends BaseDomain {
+
+  public _data: IAccount;
   protected currency: Currency;
+  protected transactions: Transaction[] = [];
 
   constructor(
     data: inAccount,
     currency: Currency
   ) {
-    this.data = {
-      ...data,
+    super(deps);
+    this.currency = currency;
+    this._data = {
       account_id: data.account_id || null,
+      profile_id: data.profile_id,
+      name: data.name,
       description: data.description || null,
       bank_name: data.bank_name || null,
       currency_iso_code: currency.data.currency_iso_code,
@@ -31,18 +39,17 @@ export class Account {
       created_at: new Date(),
       updated_at: new Date(),
     };
-    this.currency = currency;
-    this.deps = deps;
 
     if (!currency.data.currency_iso_code || !data.name) {
-      throw new Error('Please check required values')
+      throw new AccountError('Please check required values')
     }
 
   }
 
   public async persist(): Promise<IAccount> {
-    this.data = await this.deps.repositories.account.create(this.data);
-    return this.data;;
+    this._data = await this.deps.repositories.account.create(this._data);
+    this.markAsCreated();
+    return this._data;;
   }
 
   public async updateBalance({
@@ -54,9 +61,9 @@ export class Account {
     description?: string | null,
     updated_at?: Date
   }) {
-    if (!this.data.account_id) throw new Error('Account is not persisted');
+    if (!this._data.account_id) throw new Error('Account is not persisted');
     return await this.deps.repositories.account.createBalanceUpdate({
-      account_id: this.data.account_id,
+      account_id: this._data.account_id,
       new_balance,
       description,
       updated_at
@@ -76,12 +83,12 @@ export class Account {
     description?: string | null;
     fees?: number;
   }) {
-    if (!this.data.account_id) throw new Error('Account is not persisted');
-    if (!to_account.data.account_id) throw new Error('to_account is not persisted');
+    if (!this._data.account_id) throw new Error('Account is not persisted');
+    if (!to_account._data.account_id) throw new Error('to_account is not persisted');
 
     const transfer = await this.deps.repositories.accountActivity.create({
-      account_withdrawal_id: this.data.account_id,
-      account_deposit_id: to_account.data.account_id,
+      account_withdrawal_id: this._data.account_id,
+      account_deposit_id: to_account._data.account_id,
       amount_withdrawal: -amount,
       amount_deposit: amount,
       fees,
@@ -93,14 +100,14 @@ export class Account {
   }
 
   public async getBalance(currency: Currency = this.currency) {
-    if (!this.data.account_id) throw new Error('Account is not persisted');
+    if (!this._data.account_id) throw new Error('Account is not persisted');
 
     const [
       deposits,
       withdrawals
     ] = await Promise.all([
-      this.deps.repositories.accountActivity.listDeposits(this.data.account_id),
-      this.deps.repositories.accountActivity.listWithdrawals(this.data.account_id),
+      this.deps.repositories.accountActivity.listDeposits(this._data.account_id),
+      this.deps.repositories.accountActivity.listWithdrawals(this._data.account_id),
     ]);
 
 
@@ -112,7 +119,7 @@ export class Account {
       return prev + curr.amount_deposit;
     }, 0);
 
-    const balanceOurCurrency = this.data.starting_balance + totalDeposits - totalWithdrawal;
+    const balanceOurCurrency = this._data.starting_balance + totalDeposits - totalWithdrawal;
 
     const base = this.currency.data.currency_iso_code;
     const quote = currency.data.currency_iso_code;
@@ -132,19 +139,19 @@ export class Account {
 
   public async getStats(currency?: Currency) {
 
-    if (!this.data.account_id) throw new Error('Account is not persisted');
+    if (!this._data.account_id) throw new Error('Account is not persisted');
     const selectedCurrency = currency || this.currency;
 
     const [
       deposits,
       withdrawals
     ] = await Promise.all([
-      this.deps.repositories.accountActivity.listDeposits(this.data.account_id),
-      this.deps.repositories.accountActivity.listWithdrawals(this.data.account_id),
+      this.deps.repositories.accountActivity.listDeposits(this._data.account_id),
+      this.deps.repositories.accountActivity.listWithdrawals(this._data.account_id),
     ]);
 
-    console.info(`--- ${this.data.name} Account Stats ---`)
-    console.info(this.data);
+    console.info(`--- ${this._data.name} Account Stats ---`)
+    console.info(this._data);
 
     console.info('List deposits');
     console.table(deposits);
@@ -154,6 +161,34 @@ export class Account {
 
     const balance = await this.getBalance(currency)
     console.info(`Current balance is ${balance} ${selectedCurrency.data.currency_iso_code}`)
+  }
+
+  public addTransaction({
+    amount,
+    category,
+    description = null,
+    created_at = null,
+  }: {
+    amount: number,
+    category: string,
+    description: string | null,
+    created_at: Date | null,
+  }) {
+
+    if (this.persisted.isNew || !this._data.account_id) {
+      throw new AccountError('Must persist account before adding a transaction');
+    }
+
+    const transaction = new Transaction({ 
+      account_id: this._data.account_id,
+      amount, 
+      category, 
+      description, 
+      created_at, 
+    }, this.deps);
+
+    this.transactions.push(transaction);
+    return transaction;
   }
 
 }

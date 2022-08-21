@@ -42,9 +42,9 @@ async function main(deps: IDependencies) {
     open_at: new Date('2021-02-01')
   })
 
-  console.log('binance', await binance.getBalance(), binance.data.currency_iso_code);
-  console.log('brubank', await brubank.getBalance(), brubank.data.currency_iso_code);
-  console.log('n26', await n26.getBalance(), n26.data.currency_iso_code);
+  console.log('binance', await binance.getBalance(), binance._data.currency_iso_code);
+  console.log('brubank', await brubank.getBalance(), brubank._data.currency_iso_code);
+  console.log('n26', await n26.getBalance(), n26._data.currency_iso_code);
 
   console.info('Profile Whole Balance');
   console.info(await profile.getWholeBalance(peso), peso.data.name)

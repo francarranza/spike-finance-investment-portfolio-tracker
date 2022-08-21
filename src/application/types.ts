@@ -9,7 +9,7 @@ export interface IProfile {
 }
 
 export interface IAccount {
-  account_id: number | null | undefined;
+  account_id: number | null;
   currency_iso_code: string;
   profile_id: number;
   name: string;
@@ -53,4 +53,19 @@ export interface IAccountActivity {
   fees: number | null;
   open_at: Date;
   created_at: Date;
+}
+
+export interface ITransaction {
+  transaction_id: number | null | undefined;
+  account_id: number;
+  category: string;
+  description: string | null;
+  amount: number;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface ITransactionCategory {
+  name: string;
+  description: string | null;
 }

@@ -85,7 +85,7 @@ export class Profile {
     }
 
     const accountBalances = await Promise.all(this._accounts.map(acc => acc.getBalance(currency)));
-    const toPrint = this._accounts.map(({ data }, index): PrintRow => {
+    const toPrint = this._accounts.map(({ _data: data }, index): PrintRow => {
       return {
         account_id: data.account_id,
         name: data.name,

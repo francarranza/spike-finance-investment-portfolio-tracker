@@ -18,7 +18,7 @@ describe('Account Domain', () => {
     await profile.persist()
 
     const binance = new Account({
-      name: 'Binance', description: '', starting_balance: 900, profile_id: 1
+      name: 'Binance', description: '', starting_balance: 900, profile_id: profile.data.profile_id
     }, dollar);
 
     await binance.persist();

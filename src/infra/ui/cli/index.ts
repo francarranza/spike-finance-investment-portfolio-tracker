@@ -93,11 +93,11 @@ program
 
     const account = new Account(accountDb, currency);
     const beforeBalance = await account.getBalance();
-    console.info(`${beforeBalance} ${account.data.currency_iso_code} is the account ${account.data.name} balance before update`)
+    console.info(`${beforeBalance} ${account._data.currency_iso_code} is the account ${account._data.name} balance before update`)
 
     await account.updateBalance({ new_balance: newBalance });
     const afterBalance = await account.getBalance()
-    console.info(`${afterBalance} ${account.data.currency_iso_code} is the account ${account.data.name} balance before update`)
+    console.info(`${afterBalance} ${account._data.currency_iso_code} is the account ${account._data.name} balance before update`)
     process.exit(0);
   });
 
