@@ -5,6 +5,7 @@ import { truncateDb } from "../../../infra/database";
 import deps from "../../../infra/dependencies";
 import { Profile, ProfileError } from "../Profile";
 import { Currency } from "../Currency";
+import { NotFound } from "../../../infra/database/errors";
 
 describe('Profile Domain', () => {
 
@@ -15,7 +16,7 @@ describe('Profile Domain', () => {
     })
 
     it('Create new Profile without firstname', async () => {
-      const dollar = new Currency({ currency_iso_code: 'USD', symbol: 'a', name: 'Dollar' });
+      const dollar = new Currency({ currency_iso_code: 'USD', symbol: 'a', name: 'Dollar' }, deps);
       await dollar.persist()
 
       try {
@@ -24,7 +25,7 @@ describe('Profile Domain', () => {
           lastname: faker.name.lastName(),
           email: faker.internet.email(),
           preferred_currency: dollar
-        });
+        }, deps);
         assert.fail();
       } catch (err) {
         expect(err).instanceOf(ProfileError);
@@ -33,7 +34,7 @@ describe('Profile Domain', () => {
     });
 
     it('Profile.persist(): Success', async () => {
-      const currency = new Currency({ name: 'Euro', currency_iso_code: 'EUR', symbol: '€' })
+      const currency = new Currency({ name: 'Euro', currency_iso_code: 'EUR', symbol: '€' }, deps)
       await currency.persist();
 
       const profile = new Profile({
@@ -42,28 +43,27 @@ describe('Profile Domain', () => {
         lastname: faker.name.lastName(),
         email: faker.internet.email(),
         preferred_currency: currency
-      });
+      }, deps);
       await profile.persist()
 
       const found = await deps.repositories.profile.getById(1);
-      expect(found?.data.email).eq(profile.data.email);
+      expect(found?.email).eq(profile.data.email);
     });
 
     it('Profile.persist(): Error currency does not exists', async () => {
-      const dollar = new Currency({ currency_iso_code: 'USD', symbol: 'a', name: 'Dollar' });
+      const dollar = new Currency({ currency_iso_code: 'USD', symbol: 'a', name: 'Dollar' }, deps);
       const profile = new Profile({
-        profile_id: 1,
         firstname: faker.name.firstName(),
         lastname: faker.name.lastName(),
         email: faker.internet.email(),
         preferred_currency: dollar
-      });
+      }, deps);
 
       try {
         await profile.persist()
         assert.fail();
       } catch (err) {
-        expect(err).instanceOf(Error)
+        expect(err).instanceOf(NotFound)
       }
 
     });
@@ -75,17 +75,17 @@ describe('Profile Domain', () => {
       await truncateDb();
     });
 
-    it('Should calculate whole balance', async() => {
-      const dollar = new Currency({ currency_iso_code: 'USD', symbol: 'a', name: 'Dollar' });
-      const euro = new Currency({ currency_iso_code: 'EUR', symbol: 'a', name: 'Euro' });
-      await Promise.all([ dollar.persist(), euro.persist() ]);
+    it('Should calculate whole balance', async () => {
+      const dollar = new Currency({ currency_iso_code: 'USD', symbol: 'a', name: 'Dollar' }, deps);
+      const euro = new Currency({ currency_iso_code: 'EUR', symbol: 'a', name: 'Euro' }, deps);
+      await Promise.all([dollar.persist(), euro.persist()]);
 
       // Rates
       await euro.addRate({ quote_currency: dollar, value: 1.10 })
       await euro.addRate({ quote_currency: dollar, value: 2.00 })
       await dollar.addRate({ quote_currency: euro, value: 0.5 })
 
-      const profile = new Profile({ firstname: faker.name.firstName(), preferred_currency: euro,  })
+      const profile = new Profile({ firstname: faker.name.firstName(), preferred_currency: euro, }, deps)
       await profile.persist();
 
       await profile.createAccount({ name: 'A', currency: euro, starting_balance: 1000 });

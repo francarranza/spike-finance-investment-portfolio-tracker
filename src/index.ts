@@ -48,7 +48,7 @@ async function main(deps: IDependencies) {
   console.log('n26', await n26.getBalance(), n26._data.currency_iso_code);
 
   console.info('Profile Whole Balance');
-  console.info(await profile.getWholeBalance(peso), peso.data.name)
+  console.info(await profile.getWholeBalance(peso), peso._data.name)
 
   process.exit(0)
 }

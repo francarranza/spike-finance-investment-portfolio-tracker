@@ -1,24 +1,29 @@
 import { Knex } from "knex";
 import { tableNames } from "../../infra/database/types";
-import { Currency } from "../domain/Currency";
-import { Profile } from "../domain/Profile";
+import { ILogger } from "../../infra/logger/definitions";
+import { BaseRepository } from "../common/BaseRepository";
+import { NotFound, SqliteError } from "../../infra/database/errors";
 import { ICurrency, IProfile } from "../types";
 
-export class ProfileRepo {
+export class ProfileRepo extends BaseRepository {
 
-  private db: Knex;
-  private table: Knex.QueryBuilder<IProfile, {}>;
-  constructor(db: Knex) {
-    this.db = db;
-    this.table = this.db.table<IProfile>(tableNames.profiles)
+  constructor(db: Knex, logger: ILogger) {
+    super(tableNames.profiles, db, logger);
   }
 
   public async create(data: IProfile): Promise<IProfile> {
-    const [inserted] = await this.table.insert(data, "*");
-    return inserted;
+    try {
+      const [inserted] = await this.db.table(this.tablename).insert(data, "*");
+      return inserted;
+    } catch (err: unknown) {
+      const error = err as SqliteError
+      this.logger.warn(`[ProfileRepo.create] Tried to insert with currency "${data.currency}" which doesnt exists`)
+      this.logger.warn(`[ProfileRepo.create] Error code: ${error.code}`)
+      throw new NotFound('Currency not found');
+    }
   }
 
-  public async getById(profile_id: number): Promise<Profile | null> {
+  public async getById(profile_id: number): Promise<IProfile | null> {
     const found = await this.db.table<IProfile>(tableNames.profiles)
       .select("*")
       .where('profile_id', profile_id)
@@ -30,10 +35,14 @@ export class ProfileRepo {
       .where('currency_iso_code', found.preferred_currency)
       .first();
 
-    if (!currency) return null;
-    const currInstance = new Currency(currency);
+    if (!currency) {
+      throw new NotFound('Currency must exist')
+    }
 
-    return new Profile({ ...found, preferred_currency: currInstance });
+    return {
+      ...found,
+      currency,
+    }
   }
 
 }

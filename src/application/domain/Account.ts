@@ -1,12 +1,11 @@
 import deps from '../../infra/dependencies'
-import { IDependencies } from "../../infra/dependencies/definitions";
 import { BaseDomain } from '../common/BaseDomain';
 import { DomainError } from '../common/errors/DomainError';
-import { IAccount, ICurrency } from '../types';
+import { IAccount } from '../types';
 import { Currency } from './Currency';
 import { Transaction } from './Transaction';
 
-export type inAccount = {
+export type CreateAccount = {
   account_id: number | null,
   profile_id: number,
   name: string,
@@ -24,7 +23,7 @@ export class Account extends BaseDomain {
   protected transactions: Transaction[] = [];
 
   constructor(
-    data: inAccount,
+    data: CreateAccount,
     currency: Currency
   ) {
     super(deps);
@@ -35,13 +34,13 @@ export class Account extends BaseDomain {
       name: data.name,
       description: data.description || null,
       bank_name: data.bank_name || null,
-      currency_iso_code: currency.data.currency_iso_code,
+      currency_iso_code: currency._data.currency_iso_code,
       starting_balance: data.starting_balance || 0,
       created_at: new Date(),
       updated_at: new Date(),
     };
 
-    if (!currency.data.currency_iso_code || !data.name) {
+    if (!currency._data.currency_iso_code || !data.name) {
       throw new AccountError('Please check required values')
     }
 
@@ -122,8 +121,8 @@ export class Account extends BaseDomain {
 
     const balanceOurCurrency = this._data.starting_balance + totalDeposits - totalWithdrawal;
 
-    const base = this.currency.data.currency_iso_code;
-    const quote = currency.data.currency_iso_code;
+    const base = this.currency._data.currency_iso_code;
+    const quote = currency._data.currency_iso_code;
     if (base === quote) {
       return balanceOurCurrency;
     }
@@ -161,7 +160,7 @@ export class Account extends BaseDomain {
     console.table(withdrawals);
 
     const balance = await this.getBalance(currency)
-    console.info(`Current balance is ${balance} ${selectedCurrency.data.currency_iso_code}`)
+    console.info(`Current balance is ${balance} ${selectedCurrency._data.currency_iso_code}`)
   }
 
   public addTransaction({

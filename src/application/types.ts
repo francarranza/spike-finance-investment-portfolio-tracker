@@ -6,6 +6,8 @@ export interface IProfile {
   email: string | null;
   created_at: Date;
   updated_at: Date;
+
+  currency?: ICurrency;
 }
 
 export interface IAccount {

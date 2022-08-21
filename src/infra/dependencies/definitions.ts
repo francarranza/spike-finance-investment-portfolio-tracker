@@ -3,16 +3,18 @@ import { AccountActivityRepo } from "../../application/repositories/AccountActiv
 import { AccountRepo } from "../../application/repositories/AccountRepo";
 import { CurrencyRepo } from "../../application/repositories/CurrencyRepo";
 import { ProfileRepo } from "../../application/repositories/ProfileRepo";
-import { Logger } from "../logger/definitions";
+import { ILogger } from "../logger/definitions";
 
 
 export interface IDependencies {
   db: Knex;
-  logger: Logger;
-  repositories: {
-    account: AccountRepo;
-    currency: CurrencyRepo;
-    accountActivity: AccountActivityRepo;
-    profile: ProfileRepo;
-  };
+  logger: ILogger;
+  repositories: IRepoDependencies;
+}
+
+export interface IRepoDependencies {
+  account: AccountRepo;
+  currency: CurrencyRepo;
+  accountActivity: AccountActivityRepo;
+  profile: ProfileRepo;
 }

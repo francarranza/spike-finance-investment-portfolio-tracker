@@ -1,9 +1,9 @@
 import { IProfile } from "../types";
-import deps from "../../infra/dependencies";
 import { IDependencies } from "../../infra/dependencies/definitions";
 import { Account } from "./Account";
 import { Currency } from "./Currency";
 import { DomainError } from "../common/errors/DomainError";
+import { BaseDomain } from "../common/BaseDomain";
 
 type ProfileCreate = {
   firstname: string;
@@ -23,12 +23,11 @@ type AccountCreate = {
 
 export class ProfileError extends DomainError {}
 
-export class Profile {
+export class Profile extends BaseDomain {
 
-  private deps: IDependencies;
-  private _data: IProfile;
-  private _currency: Currency;
-  private _accounts: Account[] = [];
+  protected _data: IProfile;
+  protected _currency: Currency;
+  protected _accounts: Account[] = [];
 
   constructor({
     firstname,
@@ -36,15 +35,15 @@ export class Profile {
     profile_id = null,
     lastname = null,
     email = null,
-  }: ProfileCreate) {
-    this.deps = deps;
+  }: ProfileCreate, deps: IDependencies) {
+    super(deps);
     this._currency = preferred_currency;
     this._data = {
       profile_id,
       firstname,
       lastname,
       email,
-      preferred_currency: preferred_currency.data.currency_iso_code,
+      preferred_currency: preferred_currency._data.currency_iso_code,
       created_at: new Date(),
       updated_at: new Date(),
     };
@@ -70,7 +69,7 @@ export class Profile {
   public async getAccounts() {
     if (!this._data?.profile_id) throw new ProfileError('Profile is not initialized with data');
     const accounts = await this.deps.repositories.account.listByProfile(this._data.profile_id);
-    this._accounts = accounts;
+    this._accounts = accounts.map(a => new Account(a, this._currency));
     return accounts;
   }
 
@@ -96,16 +95,16 @@ export class Profile {
         description: data.description,
         bank_name: data.bank_name,
         balance: accountBalances[index],
-        currency: currency.data.currency_iso_code || data.currency_iso_code
+        currency: currency._data.currency_iso_code || data.currency_iso_code
       }
     });
 
-    console.info('All account status')
-    console.table(toPrint)
+    this.logger.info('All account status')
+    this.logger.table(toPrint)
 
     const total = await this.getWholeBalance(currency);
-    console.info('Whole accounts balance')
-    console.info(`${total.toLocaleString()} ${currency.data.currency_iso_code}`)
+    this.logger.info('Whole accounts balance')
+    this.logger.info(`${total.toLocaleString()} ${currency._data.currency_iso_code}`)
 
   }
 

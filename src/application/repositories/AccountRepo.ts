@@ -1,6 +1,8 @@
 import { Knex } from "knex";
+import { NotFound } from "../../infra/database/errors";
 import { tableNames } from "../../infra/database/types";
-import { Account } from "../domain/Account";
+import { ILogger } from "../../infra/logger/definitions";
+import { BaseRepository } from "../common/BaseRepository";
 import { IAccount, IBalanceUpdate } from "../types";
 import { CurrencyRepo } from "./CurrencyRepo";
 
@@ -13,20 +15,27 @@ type AccountCreate = {
   description?: string | null,
 }
 
-export class AccountRepo {
+export class AccountRepo extends BaseRepository {
 
-  private db: Knex;
-  private currencyRepo: CurrencyRepo;
+  protected currencyRepo: CurrencyRepo;
 
-  constructor(db: Knex, currencyRepo: CurrencyRepo) {
-    this.db = db;
+  constructor(db: Knex, logger: ILogger, currencyRepo: CurrencyRepo) {
+    super(tableNames.accounts, db, logger)
     this.currencyRepo = currencyRepo;
   }
 
-  public async create({ profile_id, name, currency_iso_code, bank_name, starting_balance, description }: AccountCreate): Promise<IAccount> {
-    if (currency_iso_code) {
-      const found = this.currencyRepo.getByIsoCode(currency_iso_code);
-      if (!found) throw new Error('[AccountRepo.create] iso_code not found');
+  public async create({
+    profile_id,
+    name,
+    currency_iso_code,
+    bank_name,
+    starting_balance,
+    description
+  }: AccountCreate): Promise<IAccount> {
+    const found = this.currencyRepo.getByIsoCode(currency_iso_code);
+    if (!found) {
+      this.logger.debug(`[AccountRepo.create] Attempted to create account with currency iso "${currency_iso_code}"`);
+      throw new NotFound('Currency not found');
     }
 
     const [account] = await this.db
@@ -36,22 +45,17 @@ export class AccountRepo {
     return account;
   }
 
-  public async list() {
+  public async list(): Promise<IAccount[]> {
     return await this.db.table(tableNames.accounts).select('*');
   }
 
-  public async listByProfile(profile_id: number): Promise<Account[]> {
-    const accountsDb: IAccount[] = await this.db.table(tableNames.accounts)
+  public async listByProfile(profile_id: number): Promise<IAccount[]> {
+    const accounts: IAccount[] = await this.db.table(tableNames.accounts)
       .select('*')
       .where('profile_id', profile_id)
       .orderBy('bank_name', 'asc');
 
-    const proms = accountsDb.map(async (acc) => {
-      const currDb = await this.currencyRepo.getByIsoCode(acc.currency_iso_code)
-      if(!currDb) throw new Error('Currency not found')
-      return new Account(acc, currDb)
-    });
-    return await Promise.all(proms);
+    return accounts;
   }
 
   public async getById(id: number): Promise<IAccount> {

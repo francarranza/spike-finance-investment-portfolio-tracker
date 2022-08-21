@@ -1,10 +1,11 @@
 import { Currency } from "../../../application/domain/Currency";
+import { IDependencies } from "../../dependencies/definitions";
 
-export default async function seedCurrencies() {
+export default async function seedCurrencies(deps: IDependencies) {
 
-  const dollar = new Currency({ currency_iso_code: 'USD', name: 'Dollar', symbol: '$' });
-  const peso = new Currency({ currency_iso_code: 'ARS', name: 'Peso', symbol: '$' });
-  const euro = new Currency({ currency_iso_code: 'EUR', name: 'Euro', symbol: '€' });
+  const dollar = new Currency({ currency_iso_code: 'USD', name: 'Dollar', symbol: '$' }, deps);
+  const peso = new Currency({ currency_iso_code: 'ARS', name: 'Peso', symbol: '$' }, deps);
+  const euro = new Currency({ currency_iso_code: 'EUR', name: 'Euro', symbol: '€' }, deps);
 
   await Promise.all([
     dollar.persist(),

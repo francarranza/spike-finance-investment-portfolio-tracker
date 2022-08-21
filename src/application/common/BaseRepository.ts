@@ -1,19 +1,19 @@
 import { Knex } from "knex";
 import { tableNames } from "../../infra/database/types";
-import { IDependencies } from "../../infra/dependencies/definitions";
-import { RepositoryError } from "./errors/RepositoryError";
+import { ILogger } from "../../infra/logger/definitions";
+import { RepositoryError } from "../../infra/database/errors";
 
 
-export class BaseRepository<T>{
+export class BaseRepository{
   
-  protected deps: IDependencies;
   protected db: Knex;
-  protected table: Knex.QueryBuilder<T, any>;
+  protected logger: ILogger;
+  protected tablename: string;
 
-  constructor(tablename: string, deps: IDependencies) {
-    this.deps = deps;
-    this.db = deps.db;
-    this.table = this.db.table<T>(tablename);
+  constructor(tablename: string, db: Knex, logger: ILogger) {
+    this.db = db;
+    this.logger = logger;
+    this.tablename = tablename;
 
     if (!Object.values(tableNames).includes(tablename)) {
       throw new RepositoryError('Invalid tablename');

@@ -1,7 +1,7 @@
 import { expect } from "chai";
-import { before, describe, it } from "mocha";
+import { describe, it } from "mocha";
+import testDeps from "../../../../test/setup/dependencies";
 import { truncateDb } from "../../../infra/database";
-import { Account } from "../Account";
 import { Currency } from "../Currency";
 import { Profile } from "../Profile";
 
@@ -12,16 +12,15 @@ describe('Account Domain', () => {
   });
 
   it('Account.getBalance(): Should return starting balance', async () => {
-    const dollar = new Currency({ currency_iso_code: 'USD', name: 'Dollar', symbol: '$' });
+    const dollar = new Currency({ currency_iso_code: 'USD', name: 'Dollar', symbol: '$' }, testDeps);
     await dollar.persist();
-    const profile = new Profile({ profile_id: 1, firstname: 'asd', preferred_currency: dollar })
+    const profile = new Profile({ profile_id: 1, firstname: 'asd', preferred_currency: dollar }, testDeps)
     await profile.persist()
 
-    const binance = new Account({
-      name: 'Binance', description: '', starting_balance: 900, profile_id: profile.data.profile_id
-    }, dollar);
+    const binance = await profile.createAccount({
+      name: 'Binance', description: '', starting_balance: 900, currency: dollar
+    })
 
-    await binance.persist();
     const balance = await binance.getBalance();
     expect(balance).eq(900);
   });

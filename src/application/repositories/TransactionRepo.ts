@@ -1,27 +1,26 @@
+import { Knex } from "knex";
 import { tableNames } from "../../infra/database/types";
-import { IDependencies } from "../../infra/dependencies/definitions";
+import { ILogger } from "../../infra/logger/definitions";
 import { BaseRepository } from "../common/BaseRepository";
-import { Transaction } from "../domain/Transaction";
 import { ITransaction } from "../types";
 
-export class TransactionRepo extends BaseRepository<ITransaction> {
+export class TransactionRepo extends BaseRepository {
 
-  constructor(deps: IDependencies) {
-    super(tableNames.transactions, deps)
+  constructor(db: Knex, logger: ILogger) {
+    super(tableNames.transactions, db, logger)
   }
 
   public async create(data: ITransaction): Promise<ITransaction> {
-    const [inserted] = await this.table.insert(data, "*");
+    const [inserted] = await this.db.table(this.tablename).insert(data, "*");
     return inserted;
   }
 
-  public async getById(transaction_id: number): Promise<Transaction | null> {
+  public async getById(transaction_id: number): Promise<ITransaction | null> {
     const found = await this.db.table<ITransaction>(tableNames.profiles)
       .select("*")
       .where('transaction_id', transaction_id)
       .first();
-    if (!found) return null;
-    return new Transaction({ ...found }, this.deps);
+    return found || null;
   }
 
 }

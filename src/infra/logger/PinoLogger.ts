@@ -1,7 +1,7 @@
-import { Logger, LogLevels } from "./definitions";
+import { ILogger, LogLevels } from "./definitions";
 
 
-export class PinoLogger implements Logger {
+export class PinoLogger implements ILogger {
 
   private client: Console;
   public level: LogLevels;

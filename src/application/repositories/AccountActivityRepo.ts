@@ -1,15 +1,16 @@
 import { Knex } from "knex";
 import { tableNames } from "../../infra/database/types";
+import { ILogger } from "../../infra/logger/definitions";
+import { BaseRepository } from "../common/BaseRepository";
 import { IAccountActivity } from "../types";
 import { CurrencyRepo } from "./CurrencyRepo";
 
-export class AccountActivityRepo {
+export class AccountActivityRepo extends BaseRepository {
 
-  private db: Knex;
-  private currencyRepo: CurrencyRepo;
+  protected currencyRepo: CurrencyRepo;
 
-  constructor(db: Knex, currencyRepo: CurrencyRepo) {
-    this.db = db;
+  constructor(db: Knex, logger: ILogger, currencyRepo: CurrencyRepo) {
+    super(tableNames.accountActivity, db, logger)
     this.currencyRepo = currencyRepo;
   }
 

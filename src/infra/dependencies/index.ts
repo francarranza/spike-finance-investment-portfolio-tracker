@@ -7,14 +7,15 @@ import { ConsoleLogger } from "../logger/ConsoleLogger";
 import { IDependencies } from "./definitions";
 
 
-const currencyRepo = new CurrencyRepo(db);
-const accountRepo = new AccountRepo(db, currencyRepo);
-const accountActivityRepo = new AccountActivityRepo(db, currencyRepo);
-const profileRepo = new ProfileRepo(db);
+const logger = new ConsoleLogger();
+const currencyRepo = new CurrencyRepo(db, logger);
+const accountRepo = new AccountRepo(db, logger, currencyRepo);
+const accountActivityRepo = new AccountActivityRepo(db, logger, currencyRepo);
+const profileRepo = new ProfileRepo(db, logger);
 
 const deps: IDependencies = {
   db,
-  logger: new ConsoleLogger(),
+  logger,
   repositories: {
     account: accountRepo,
     currency: currencyRepo,

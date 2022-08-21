@@ -19,7 +19,7 @@ program
   .argument('<symbol>', 'Eg: €, $')
   .action(async (iso_code, name, symbol) => {
     const currency = await addCurrency({ currency_iso_code: iso_code, name, symbol }, deps);
-    console.info(currency.data);
+    console.info(currency._data);
     process.exit(0);
   });
 

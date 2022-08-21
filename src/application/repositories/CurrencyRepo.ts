@@ -1,29 +1,38 @@
 import { Knex } from "knex";
+import { SqliteError } from "../../infra/database/errors";
 import { tableNames } from "../../infra/database/types";
-import { Currency } from "../domain/Currency";
+import { ILogger } from "../../infra/logger/definitions";
+import { BaseRepository } from "../common/BaseRepository";
 import { ICurrency, ICurrencyRate } from "../types";
 
-export class CurrencyRepo {
+export class CurrencyRepo extends BaseRepository {
 
-  private db: Knex;
-  constructor(db: Knex) {
-    this.db = db;
+  constructor(db: Knex, logger: ILogger) {
+    super(tableNames.currencies, db, logger);
   }
 
   public async create(data: ICurrency): Promise<ICurrency> {
-    const [currency] = await this.db.table('currencies').insert(data, "*");
-    return currency;
+    try {
+      const [currency] = await this.db.table(this.tablename).insert(data, "*");
+      return currency;
+    } catch (err) {
+      this.logger.error(err);
+      this.logger.error(JSON.stringify(err));
+      const error = err as SqliteError;
+      throw err;
+    }
   }
 
   public async list(): Promise<ICurrency[]> {
-    return await this.db.table('currencies').select('*');
+    return await this.db.table(this.tablename).select('*');
   }
 
-  public async getByIsoCode(iso_code: string): Promise<Currency | null> {
-    const found = await this.db.table('currencies')
-      .select("*").where('currency_iso_code', iso_code).first();
+  public async getByIsoCode(iso_code: string): Promise<ICurrency | null> {
+    const found = await this.db.table(this.tablename).select("*")
+      .where('currency_iso_code', iso_code)
+      .first();
     if (!found) return null;
-    return new Currency(found);
+    return found;
   }
 
   public async insertNewRate({

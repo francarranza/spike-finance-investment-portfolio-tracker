@@ -15,7 +15,7 @@ type TransactionCreate = {
 
 export class Transaction  extends BaseDomain {
 
-  private _data: ITransaction;
+  protected _data: ITransaction;
 
   constructor(data: TransactionCreate, deps: IDependencies) {
     super(deps);

@@ -28,17 +28,32 @@ __Crypto wallet__
 ## Tech stack
 
   - Nodejs 16 + Typescript + Yarn
-  - [typeDI]() for dependencies managment
   - Mocha and Chai as testing framework
   - [pino]() logger
   - Sqlite for data with [knex]() as sql builder
-  - [zod] for validations
-  - `Future` [Bull]() for background tasks
   - [commanderjs]() as CLI API
+  - `Future` [zod] for validations
+  - `Future` [Bull]() for background tasks
 
 ## Software design principles
 
-  - SOLID
-  - Hexagonal or similar architecture
-  - Integration testing
+  - OOP
+  - Active records
+  - Layers: ( Domain <-- Repository ) --> ui
+  - Dependency Injection
+  - Integration testing with test DB
   - Unit testing for critical use cases
+
+__Notes__:
+  - Arrow --> means injected into.
+  - Repository is the data persistance layer.
+
+### OOP
+
+__Active records__
+
+- An object can persist itself. See [Active Record Pattern](https://en.wikipedia.org/wiki/Active_record_pattern)
+- Repositories are injected into the Domain
+
+Interesting thread between OOP with active records vs let's say, clean architecture:
+[Link](https://softwareengineering.stackexchange.com/questions/379992/is-domain-persistence-model-isolation-usually-this-awkward)
