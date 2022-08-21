@@ -1,8 +1,8 @@
 import { Knex } from "knex";
-import { AccountActivityRepo } from "../../application/repositories/AccountActivityRepo";
-import { AccountRepo } from "../../application/repositories/AccountRepo";
-import { CurrencyRepo } from "../../application/repositories/CurrencyRepo";
-import { ProfileRepo } from "../../application/repositories/ProfileRepo";
+import { AccountActivityRepo } from "../database/repositories/AccountActivityRepo";
+import { AccountRepo } from "../database/repositories/AccountRepo";
+import { CurrencyRepo } from "../database/repositories/CurrencyRepo";
+import { ProfileRepo } from "../database/repositories/ProfileRepo";
 import { ILogger } from "../logger/definitions";
 
 

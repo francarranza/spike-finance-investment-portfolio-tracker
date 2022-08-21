@@ -1,8 +1,8 @@
 import { Knex } from "knex";
-import { tableNames } from "../../infra/database/types";
-import { ILogger } from "../../infra/logger/definitions";
-import { BaseRepository } from "../common/BaseRepository";
-import { ITransaction } from "../types";
+import { tableNames } from "../types";
+import { ILogger } from "../../logger/definitions";
+import { BaseRepository } from "./common/BaseRepository";
+import { ITransaction } from "../../../application/types";
 
 export class TransactionRepo extends BaseRepository {
 

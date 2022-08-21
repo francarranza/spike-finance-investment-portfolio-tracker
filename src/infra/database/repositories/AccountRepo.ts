@@ -1,9 +1,9 @@
 import { Knex } from "knex";
-import { NotFound } from "../../infra/database/errors";
-import { tableNames } from "../../infra/database/types";
-import { ILogger } from "../../infra/logger/definitions";
-import { BaseRepository } from "../common/BaseRepository";
-import { IAccount, IBalanceUpdate } from "../types";
+import { NotFound } from "./common/errors";
+import { tableNames } from "../types";
+import { ILogger } from "../../logger/definitions";
+import { BaseRepository } from "./common/BaseRepository";
+import { IAccount, IBalanceUpdate } from "../../../application/types";
 import { CurrencyRepo } from "./CurrencyRepo";
 
 type AccountCreate = {

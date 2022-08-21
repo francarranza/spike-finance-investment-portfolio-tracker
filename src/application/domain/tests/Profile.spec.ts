@@ -5,7 +5,7 @@ import { truncateDb } from "../../../infra/database";
 import deps from "../../../infra/dependencies";
 import { Profile, ProfileError } from "../Profile";
 import { Currency } from "../Currency";
-import { NotFound } from "../../../infra/database/errors";
+import { NotFound } from "../../../infra/database/repositories/common/errors";
 
 describe('Profile Domain', () => {
 

@@ -1,11 +1,11 @@
 import { Knex } from "knex";
-import { tableNames } from "../../infra/database/types";
-import { ILogger } from "../../infra/logger/definitions";
-import { RepositoryError } from "../../infra/database/errors";
+import { tableNames } from "../../types";
+import { ILogger } from "../../../logger/definitions";
+import { RepositoryError } from "./errors";
 
 
-export class BaseRepository{
-  
+export class BaseRepository {
+
   protected db: Knex;
   protected logger: ILogger;
   protected tablename: string;

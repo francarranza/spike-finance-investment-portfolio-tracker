@@ -1,7 +1,7 @@
-import { AccountActivityRepo } from "../../src/application/repositories/AccountActivityRepo";
-import { AccountRepo } from "../../src/application/repositories/AccountRepo";
-import { CurrencyRepo } from "../../src/application/repositories/CurrencyRepo";
-import { ProfileRepo } from "../../src/application/repositories/ProfileRepo";
+import { AccountActivityRepo } from "../../src/infra/database/repositories/AccountActivityRepo";
+import { AccountRepo } from "../../src/infra/database/repositories/AccountRepo";
+import { CurrencyRepo } from "../../src/infra/database/repositories/CurrencyRepo";
+import { ProfileRepo } from "../../src/infra/database/repositories/ProfileRepo";
 import { db } from "../../src/infra/database";
 import { IDependencies } from "../../src/infra/dependencies/definitions";
 import { SilentLogger } from "../../src/infra/logger/SilentLogger";

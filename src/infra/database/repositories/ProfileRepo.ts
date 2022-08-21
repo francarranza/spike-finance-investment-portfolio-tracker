@@ -1,9 +1,9 @@
 import { Knex } from "knex";
-import { tableNames } from "../../infra/database/types";
-import { ILogger } from "../../infra/logger/definitions";
-import { BaseRepository } from "../common/BaseRepository";
-import { NotFound, SqliteError } from "../../infra/database/errors";
-import { ICurrency, IProfile } from "../types";
+import { tableNames } from "../types";
+import { ILogger } from "../../logger/definitions";
+import { BaseRepository } from "./common/BaseRepository";
+import { NotFound, SqliteError } from "./common/errors";
+import { ICurrency, IProfile } from "../../../application/types";
 
 export class ProfileRepo extends BaseRepository {
 
