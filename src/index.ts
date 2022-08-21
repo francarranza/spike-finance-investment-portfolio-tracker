@@ -2,7 +2,8 @@ import { Currency } from "./application/domain/Currency";
 import { Profile } from "./application/domain/Profile";
 import { truncateDb } from "./infra/database";
 import seedCurrencies from "./infra/database/seeds/currencies";
-import deps, { IDependencies } from "./infra/dependencies";
+import deps from "./infra/dependencies";
+import { IDependencies } from "./infra/dependencies/definitions";
 
 async function main(deps: IDependencies) {
 

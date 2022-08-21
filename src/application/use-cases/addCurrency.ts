@@ -1,4 +1,4 @@
-import { IDependencies } from "../../infra/dependencies";
+import { IDependencies } from "../../infra/dependencies/definitions";
 import { Currency } from "../domain/Currency";
 
 type Input = {

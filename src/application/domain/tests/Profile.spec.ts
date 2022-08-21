@@ -1,11 +1,10 @@
 import { assert, expect } from "chai";
 import { beforeEach, describe, it } from "mocha";
-import { Faker, faker } from '@faker-js/faker';
+import { faker } from '@faker-js/faker';
 import { truncateDb } from "../../../infra/database";
 import deps from "../../../infra/dependencies";
-import { Profile } from "../Profile";
+import { Profile, ProfileError } from "../Profile";
 import { Currency } from "../Currency";
-import seedCurrencies from "../../../infra/database/seeds/currencies";
 
 describe('Profile Domain', () => {
 
@@ -28,7 +27,7 @@ describe('Profile Domain', () => {
         });
         assert.fail();
       } catch (err) {
-        expect(err).instanceOf(Error);
+        expect(err).instanceOf(ProfileError);
       }
 
     });

@@ -1,5 +1,5 @@
 import { tableNames } from "../../infra/database/types";
-import { IDependencies } from "../../infra/dependencies";
+import { IDependencies } from "../../infra/dependencies/definitions";
 import { BaseRepository } from "../common/BaseRepository";
 import { Transaction } from "../domain/Transaction";
 import { ITransaction } from "../types";

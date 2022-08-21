@@ -1,4 +1,5 @@
-import deps, { IDependencies } from '../../infra/dependencies'
+import deps from '../../infra/dependencies'
+import { IDependencies } from "../../infra/dependencies/definitions";
 import { BaseDomain } from '../common/BaseDomain';
 import { DomainError } from '../common/errors/DomainError';
 import { IAccount, ICurrency } from '../types';
@@ -49,7 +50,7 @@ export class Account extends BaseDomain {
   public async persist(): Promise<IAccount> {
     this._data = await this.deps.repositories.account.create(this._data);
     this.markAsCreated();
-    return this._data;;
+    return this._data;
   }
 
   public async updateBalance({

@@ -1,4 +1,4 @@
-import { IDependencies } from "../../infra/dependencies";
+import { IDependencies } from "../../infra/dependencies/definitions";
 import { IPersisted } from "./PersistanceOpts";
 
 

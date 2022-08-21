@@ -1,6 +1,6 @@
 import { Knex } from "knex";
 import { tableNames } from "../../infra/database/types";
-import { IDependencies } from "../../infra/dependencies";
+import { IDependencies } from "../../infra/dependencies/definitions";
 import { RepositoryError } from "./errors/RepositoryError";
 
 

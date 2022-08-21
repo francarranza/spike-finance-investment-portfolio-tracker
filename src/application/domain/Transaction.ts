@@ -1,5 +1,5 @@
 import { ITransaction } from "../types";
-import { IDependencies } from "../../infra/dependencies";
+import { IDependencies } from "../../infra/dependencies/definitions";
 import { BaseDomain } from "../common/BaseDomain";
 
 type TransactionCreate = {

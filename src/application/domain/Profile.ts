@@ -1,7 +1,9 @@
 import { IProfile } from "../types";
-import deps, { IDependencies } from "../../infra/dependencies";
+import deps from "../../infra/dependencies";
+import { IDependencies } from "../../infra/dependencies/definitions";
 import { Account } from "./Account";
 import { Currency } from "./Currency";
+import { DomainError } from "../common/errors/DomainError";
 
 type ProfileCreate = {
   firstname: string;
@@ -18,6 +20,8 @@ type AccountCreate = {
   bank_name?: string | null,
   starting_balance?: number,
 }
+
+export class ProfileError extends DomainError {}
 
 export class Profile {
 
@@ -45,8 +49,8 @@ export class Profile {
       updated_at: new Date(),
     };
 
-    if (!firstname) throw new Error('Profile: Please provide a firstname');
-    if (!preferred_currency) throw new Error('Profile: Please provide a currency');
+    if (!firstname) throw new ProfileError('Profile: Please provide a firstname');
+    if (!preferred_currency) throw new ProfileError('Profile: Please provide a currency');
   }
 
   public get data() {
@@ -58,13 +62,13 @@ export class Profile {
   }
 
   public async persist() {
-    if (!this._data) throw new Error('Profile is not initialized with data');
+    if (!this._data) throw new ProfileError('Profile is not initialized with data');
     const created = await this.deps.repositories.profile.create(this._data);
     this._data = created;
   }
 
   public async getAccounts() {
-    if (!this._data?.profile_id) throw new Error('Profile is not initialized with data');
+    if (!this._data?.profile_id) throw new ProfileError('Profile is not initialized with data');
     const accounts = await this.deps.repositories.account.listByProfile(this._data.profile_id);
     this._accounts = accounts;
     return accounts;
@@ -109,8 +113,12 @@ export class Profile {
    * Creates account with selected currency
    */
   public async createAccount(input: AccountCreate) {
-    if (!this._data?.profile_id) throw new Error('Profile is not initialized with data');
-    const created = new Account({ ...input, profile_id: this._data.profile_id }, input.currency);
+    if (!this._data.profile_id) throw new ProfileError('Profile is not initialized with data');
+    const created = new Account({
+      ...input,
+      account_id: null,
+      profile_id: this._data.profile_id
+    }, input.currency);
     await created.persist()
     this._accounts.push(created);
     return created;

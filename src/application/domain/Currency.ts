@@ -1,5 +1,6 @@
 import { ICurrency } from "../types";
-import deps, { IDependencies } from "../../infra/dependencies";
+import deps from "../../infra/dependencies";
+import { IDependencies } from "../../infra/dependencies/definitions";
 
 export class Currency {
 
