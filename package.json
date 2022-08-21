@@ -9,12 +9,16 @@
     "tsc": "tsc",
     "test": "NODE_ENV=test node_modules/.bin/mocha --exit -r node_modules/ts-node/register src/**/*.spec.ts",
     "build": "rimraf ./dist && tsc",
+    "lint": "eslint . --ext .ts",
     "cli": "ts-node src/infra/ui/cli/index.ts --"
   },
   "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.33.1",
+    "@typescript-eslint/parser": "^5.33.1",
     "better-sqlite3": "^7.6.2",
     "commander": "^9.4.0",
     "dotenv": "^16.0.1",
+    "eslint": "^8.22.0",
     "knex": "^2.2.0",
     "pino": "^8.3.1",
     "pino-pretty": "^8.1.0",
