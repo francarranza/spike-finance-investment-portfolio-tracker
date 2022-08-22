@@ -1,9 +1,5 @@
 
 TODO
-  - Accounts
-    - Expenses features: Insert, getBalance()
-    - Income features: Insert, getBalance()
-
   - Currencies:
     - Get daily rates from external service. ISO: EUR, USD, ARS, ARS blue, GBP
 
@@ -21,6 +17,13 @@ TODO
     - Individual asset performance by time frame. 
       Eg: MELI I could have bought and selled many times, at different prices
     - Compare my performance with others such as SP500, Nasdaq100, an ETF, etc.
+
+0.4
+  - Feature: `Account`:
+    - Add transactions as Income or Expense.
+    - Create custom transaction categories.
+
+  - Update: `Account`: Get Balance supports transactions.
 
 0.3
   - Feature: Get whole balance in selected currency

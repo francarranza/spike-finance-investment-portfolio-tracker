@@ -143,6 +143,7 @@ export class Account extends BaseDomain {
   }
 
   public async getStats(currency?: Currency) {
+    // TODO: Add transaction support
 
     if (!this._data.account_id) throw new Error('Account is not persisted');
     const selectedCurrency = currency || this.currency;
