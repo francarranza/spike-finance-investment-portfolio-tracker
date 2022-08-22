@@ -5,12 +5,14 @@ import { ProfileRepo } from "../../src/infra/database/repositories/ProfileRepo";
 import { db } from "../../src/infra/database";
 import { IDependencies } from "../../src/infra/dependencies/definitions";
 import { SilentLogger } from "../../src/infra/logger/SilentLogger";
+import { TransactionRepo } from "../../src/infra/database/repositories/TransactionRepo";
 
 const logger = new SilentLogger();
 const currencyRepo = new CurrencyRepo(db, logger);
 const accountRepo = new AccountRepo(db, logger, currencyRepo);
 const accountActivityRepo = new AccountActivityRepo(db, logger, currencyRepo);
 const profileRepo = new ProfileRepo(db, logger);
+const transactionRepo = new TransactionRepo(db, logger);
 
 const testDeps: IDependencies = {
   db,
@@ -20,6 +22,7 @@ const testDeps: IDependencies = {
     currency: currencyRepo,
     accountActivity: accountActivityRepo,
     profile: profileRepo,
+    transaction: transactionRepo,
   }
 }
 

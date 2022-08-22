@@ -46,6 +46,10 @@ export class Account extends BaseDomain {
 
   }
 
+  get data() {
+    return this._data;
+  }
+
   public async persist(): Promise<IAccount> {
     this._data = await this.deps.repositories.account.create(this._data);
     this.markAsCreated();
@@ -104,22 +108,23 @@ export class Account extends BaseDomain {
 
     const [
       deposits,
-      withdrawals
+      withdrawals,
+      transactions,
     ] = await Promise.all([
       this.deps.repositories.accountActivity.listDeposits(this._data.account_id),
       this.deps.repositories.accountActivity.listWithdrawals(this._data.account_id),
+      this.deps.repositories.transaction.list(this._data.account_id),
     ]);
 
 
-    const totalDeposits = deposits.reduce((prev, curr) => {
-      return prev + curr.amount_deposit;
-    }, 0);
+    const totalDeposits = deposits.reduce((prev, curr) => prev + curr.amount_deposit, 0);
+    const totalWithdrawal = withdrawals.reduce((prev, curr) => prev + curr.amount_deposit, 0);
+    const totalTransactions = transactions.reduce((prev, curr) => prev + curr.amount, 0);
 
-    const totalWithdrawal = withdrawals.reduce((prev, curr) => {
-      return prev + curr.amount_deposit;
-    }, 0);
-
-    const balanceOurCurrency = this._data.starting_balance + totalDeposits - totalWithdrawal;
+    const balanceOurCurrency = this._data.starting_balance 
+      + totalDeposits 
+      - totalWithdrawal
+      + totalTransactions;
 
     const base = this.currency._data.currency_iso_code;
     const quote = currency._data.currency_iso_code;
@@ -163,7 +168,7 @@ export class Account extends BaseDomain {
     console.info(`Current balance is ${balance} ${selectedCurrency._data.currency_iso_code}`)
   }
 
-  public addTransaction({
+  public async addTransaction({
     amount,
     category,
     description = null,
@@ -171,11 +176,11 @@ export class Account extends BaseDomain {
   }: {
     amount: number,
     category: string,
-    description: string | null,
-    created_at: Date | null,
+    description?: string | null,
+    created_at?: Date | null,
   }) {
 
-    if (this.persisted.isNew || !this._data.account_id) {
+    if (!this._data.account_id) {
       throw new AccountError('Must persist account before adding a transaction');
     }
 
@@ -187,7 +192,9 @@ export class Account extends BaseDomain {
       created_at, 
     }, this.deps);
 
+    await transaction.persist();
     this.transactions.push(transaction);
+
     return transaction;
   }
 

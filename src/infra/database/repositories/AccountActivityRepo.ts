@@ -14,7 +14,14 @@ export class AccountActivityRepo extends BaseRepository {
     this.currencyRepo = currencyRepo;
   }
 
-  public async list(): Promise<IAccountActivity[]> {
+  public async list(account_id?: number): Promise<IAccountActivity[]> {
+    if (account_id) {
+      return await this.db.table(tableNames.accountActivity)
+        .select('*')
+        .where('account_id', account_id)
+        .orderBy('open_at', 'desc');
+    }
+
     return await this.db.table(tableNames.accountActivity)
       .select('*')
       .orderBy('open_at', 'desc');

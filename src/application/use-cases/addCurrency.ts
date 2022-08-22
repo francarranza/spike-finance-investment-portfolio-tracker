@@ -9,7 +9,7 @@ type Input = {
 
 export default async function addCurrency(params: Input, deps: IDependencies) {
 
-  const currency = new Currency(params)
+  const currency = new Currency(params, deps)
   await currency.persist()
   return currency;
 

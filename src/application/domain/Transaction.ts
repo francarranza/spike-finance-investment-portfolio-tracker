@@ -34,5 +34,11 @@ export class Transaction  extends BaseDomain {
     return this._data;
   }
 
+  public async persist(): Promise<ITransaction> {
+    this._data = await this.deps.repositories.transaction.create(this._data);
+    this.markAsCreated();
+    return this._data;
+  }
+
 
 }

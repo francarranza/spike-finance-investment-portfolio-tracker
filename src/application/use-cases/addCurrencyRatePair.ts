@@ -1,4 +1,5 @@
 import { IDependencies } from "../../infra/dependencies/definitions";
+import { Currency } from "../domain/Currency";
 
 type Input = {
   base_iso_currency: string;
@@ -19,7 +20,7 @@ export default async function addCurrencyRatePair(params: Input, deps: IDependen
   ] = await Promise.all([
     deps.repositories.currency.getByIsoCode(params.base_iso_currency),
     deps.repositories.currency.getByIsoCode(params.quote_iso_currency),
-  ]);
+  ]).then(icurrs => icurrs.map(c => c && new Currency(c, deps)));
 
   if (!base || !quote) throw new Error('Base or Quote currencies do not exist in our db');
 
