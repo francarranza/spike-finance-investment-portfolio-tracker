@@ -2,7 +2,7 @@ import { Knex } from "knex";
 import { tableNames } from "../types";
 import { ILogger } from "../../logger/definitions";
 import { BaseRepository } from "./common/BaseRepository";
-import { ITransaction, ITransactionCategory } from "../../../application/types";
+import { ITransaction, ITransactionCategory, ITransactionSource } from "../../../application/types";
 
 export class TransactionRepo extends BaseRepository {
 
@@ -12,6 +12,11 @@ export class TransactionRepo extends BaseRepository {
 
   public async create(data: ITransaction): Promise<ITransaction> {
     const [inserted] = await this.db.table(this.tablename).insert(data, "*");
+    return inserted;
+  }
+
+  public async addSource(data: ITransactionSource) {
+    const [inserted] = await this.db.table(tableNames.transactionSources).insert(data, "*");
     return inserted;
   }
 

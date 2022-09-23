@@ -71,3 +71,8 @@ export interface ITransactionCategory {
   name: string;
   description: string | null;
 }
+
+export interface ITransactionSource {
+  name: string;
+  description: string | null;
+}

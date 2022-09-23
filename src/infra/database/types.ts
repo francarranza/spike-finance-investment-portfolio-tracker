@@ -7,4 +7,5 @@ export const tableNames = {
   profiles: 'profiles',
   transactions: 'transactions',
   transactionCategories: 'transaction_categories',
+  transactionSources: 'import_sources',
 }
