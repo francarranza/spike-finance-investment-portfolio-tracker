@@ -45,6 +45,7 @@ export default async function importTransactions(params: Input, deps: IDependenc
     .transform((row: ColumnMapping, next): void => {
 
       if (!currencies.includes(row.currency)) {
+        throw new Error('Not Implemented')
       }
 
       next();
