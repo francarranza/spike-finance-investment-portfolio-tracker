@@ -20,6 +20,8 @@ export interface IAccount {
   updated_at: Date;
 }
 
+export type IAccountPersisted = Omit<IAccount, 'account_id'> & { account_id: number };
+
 export interface ICurrency {
   currency_iso_code: string;
   name: string;

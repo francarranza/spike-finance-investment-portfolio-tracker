@@ -1,5 +1,5 @@
 import deps, { IDependencies } from '../../infra/dependencies'
-import { IAccount, ICurrency } from '../types';
+import { IAccount } from '../types';
 import { Currency } from './Currency';
 
 export type inAccount = {

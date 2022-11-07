@@ -5,6 +5,7 @@ import { Account } from "../../../application/domain/Account";
 import deps from "../../dependencies";
 import addCurrency from "../../../application/use-cases/addCurrency";
 import addCurrencyRatePair from "../../../application/use-cases/addCurrencyRatePair";
+import importAccountBalances from "../../../application/use-cases/importAccountBalances";
 
 program
   .name('Personal Finance Tracker')
@@ -84,8 +85,12 @@ program
   .option('--new-balance <number>', 'New balance amount')
   .action(async ({ name, newBalance }) => {
     const accountDb = await deps.repositories.account.getByName(name)
-    const currency = await deps.repositories.currency.getByIsoCode(accountDb.currency_iso_code);
+    if (!accountDb) {
+      console.error('Account not found')
+      process.exit(1)
+    }
 
+    const currency = await deps.repositories.currency.getByIsoCode(accountDb.currency_iso_code);
     if (!currency) {
       console.error('Currency not found')
       process.exit(1)
@@ -121,5 +126,20 @@ program
     await profile?.printAccountStatus(currInstance);
     process.exit(0);
   });
+
+program
+  .command('import-balances')
+  .description('Import account balances updates from CSV file')
+  .option('--filepath <string>', 'Absolute filepath')
+  .action(({ filepath }) => {
+    if(!filepath) {
+      console.error('Must provide a filepath')
+      process.exit(1)
+    }
+
+    importAccountBalances(filepath, deps);
+    process.exit(0);
+  });
+
 
 program.parse();

@@ -1,7 +1,7 @@
 import { Knex } from "knex";
 import { tableNames } from "../../infra/database/types";
 import { Account } from "../domain/Account";
-import { IAccount, IBalanceUpdate } from "../types";
+import { IAccount, IAccountPersisted, IBalanceUpdate } from "../types";
 import { CurrencyRepo } from "./CurrencyRepo";
 
 type AccountCreate = {
@@ -54,14 +54,14 @@ export class AccountRepo {
     return await Promise.all(proms);
   }
 
-  public async getById(id: number): Promise<IAccount> {
+  public async getById(id: number): Promise<IAccount | null> {
     return await this.db.table(tableNames.accounts)
       .select('*')
       .where('account_id', id)
       .first();
   }
 
-  public async getByName(name: string): Promise<IAccount> {
+  public async getByName(name: string): Promise<IAccountPersisted | null> {
     return await this.db.table(tableNames.accounts)
       .select('*')
       .where('name', name)
@@ -90,9 +90,9 @@ export class AccountRepo {
     updated_at = new Date(),
   }: {
     account_id: number,
-    new_balance: number,
+    new_balance: number | null,
     description?: string | null,
-    updated_at?: Date
+    updated_at?: Date | null
   }): Promise<IBalanceUpdate> {
     const [created] = await this.db
       .table('balance_updates')

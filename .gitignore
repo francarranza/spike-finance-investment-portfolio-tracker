@@ -155,3 +155,5 @@ test/fixtures/ts/*js
 
 data/*.sqlite
 scripts/load-accounts.ts
+
+data/csv/

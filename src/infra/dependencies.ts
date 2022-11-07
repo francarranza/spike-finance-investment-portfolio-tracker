@@ -10,8 +10,8 @@ export interface IDependencies {
   db: Knex,
   repositories: {
     account: AccountRepo,
-    currency: CurrencyRepo,
     accountActivity: AccountActivityRepo,
+    currency: CurrencyRepo,
     profile: ProfileRepo,
   }
 }
@@ -25,8 +25,8 @@ const deps: IDependencies = {
   db,
   repositories: {
     account: accountRepo,
-    currency: currencyRepo,
     accountActivity: accountActivityRepo,
+    currency: currencyRepo,
     profile: profileRepo,
   }
 }
